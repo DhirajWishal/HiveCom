@@ -7,8 +7,8 @@ project(
 set(
 	SOURCES
 
-	"${CMAKE_CURRENT_SOURCE_DIR}/AES256.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/AES256.hpp"
+	"AES256.cpp"
+	"AES256.hpp"
 )
 
 # Setup the library information.

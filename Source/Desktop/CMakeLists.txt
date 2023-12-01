@@ -7,7 +7,7 @@ project(
 set(
 	SOURCES
 
-	"${CMAKE_CURRENT_SOURCE_DIR}/Main.cpp"
+	"Main.cpp"
 )
 
 # Setup the library information.
