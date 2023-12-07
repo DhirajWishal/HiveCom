@@ -8,6 +8,10 @@ set(
 	SOURCES
 
 	"Main.cpp"
+
+	"Simulator/Reactor.cpp"
+	"Simulator/Reactor.hpp"
+	"Simulator/ThreadPool.hpp"
 )
 
 # Setup the library information.

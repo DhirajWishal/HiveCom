@@ -10,6 +10,9 @@ project(
 	DESCRIPTION "Secure communications protocol for drones based on a flying ad hoc network"
 )
 
+# Set the C++ standard.
+set(CMAKE_CXX_STANDARD 20)
+
 # Add the subdirectories.
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Source/Core)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Source/Desktop)
