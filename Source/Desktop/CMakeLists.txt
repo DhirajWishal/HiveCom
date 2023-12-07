@@ -11,7 +11,7 @@ set(
 
 	"Simulator/Reactor.cpp"
 	"Simulator/Reactor.hpp"
-	"Simulator/ThreadPool.hpp"
+	"Simulator/Node.hpp"
 )
 
 # Setup the library information.
