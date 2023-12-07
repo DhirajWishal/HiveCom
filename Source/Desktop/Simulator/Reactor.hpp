@@ -6,6 +6,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <latch>
 
 namespace HiveCom
 {
@@ -36,6 +37,7 @@ namespace HiveCom
 		std::list<TaskType> m_tasks;
 
 		std::mutex m_mutex;
+		std::latch m_startLatch = std::latch(1);
 
 		std::atomic_bool m_bShouldRun = true;
 		std::condition_variable m_conditionVariable;
