@@ -19,6 +19,9 @@ namespace HiveCom
 		/// @brief Default constructor.
 		Reactor();
 
+		/// @brief Default destructor.
+		~Reactor();
+
 		/// @brief Execute a new task.
 		/// @param task The task to be executed asynchronously.
 		void execute(TaskType task);

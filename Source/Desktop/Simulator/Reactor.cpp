@@ -8,6 +8,12 @@ namespace HiveCom
 	{
 	}
 
+	Reactor::~Reactor()
+	{
+		m_bShouldRun = false;
+		m_worker.join();
+	}
+
 	void Reactor::execute(TaskType task)
 	{
 		const auto locker = std::scoped_lock(m_mutex);
@@ -33,5 +39,10 @@ namespace HiveCom
 			// Lock it back again and run.
 			lock.lock();
 		}
+
+		// If we need to quit, quickly finish everything.
+		const auto locker = std::scoped_lock(m_mutex);
+		for (const auto &task : m_tasks)
+			task();
 	}
 }
