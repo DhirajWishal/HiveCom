@@ -18,3 +18,11 @@ add_library(
 
 	${SOURCES}
 )
+
+target_link_libraries(Core oqs)
+
+target_include_directories(
+    Core 
+    
+    PUBLIC ${LIBOQS_INCLUDE_DIR}
+)
