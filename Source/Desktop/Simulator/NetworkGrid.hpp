@@ -59,7 +59,7 @@ namespace HiveCom
         /// @brief Explicit constructor.
         /// The initial node will be considered as the root node.
         /// @param connections The connections in the grid. Make sure that each source
-        /// in the connections are unsique!
+        /// in the connections are unique!
         template <class NodeType>
         explicit NetworkGrid(const std::vector<Connection> &connections, NodeBuilder<NodeType> builder)
         {

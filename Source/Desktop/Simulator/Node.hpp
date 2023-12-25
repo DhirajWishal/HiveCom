@@ -59,6 +59,23 @@ namespace HiveCom
         /// @param message The message to handle.
         void handleMessage(const MessagePtr &message);
 
+        /// @brief Handle the message if the destination is the current node.
+        /// @param message The message to handle.
+        /// @param shouldAck If we should send an acknowledgement packet.
+        void handleMessageAccepted(const MessagePtr &message, bool shouldAck);
+
+        /// @brief Handle an acknowledgement message received by the current node.
+        /// @param message The message to handle.
+        void onAcknowledgementReceived(const MessagePtr &message);
+
+        /// @brief Handle a discovery message received by the current node.
+        /// @param message The message to handle.
+        void onDiscoveryReceived(const MessagePtr &message);
+
+        /// @brief Handle an authorization message received by the current node.
+        /// @param message The message to handle.
+        void onAuthorizationReceived(const MessagePtr &message);
+
         /// @brief Handle a message that is received by the current node.
         /// @param message The message that has been received.
         void onMessageReceived(const MessagePtr &message);
