@@ -11,7 +11,10 @@ set(
 
 	"Simulator/Reactor.cpp"
 	"Simulator/Reactor.hpp"
+	"Simulator/Node.cpp"
 	"Simulator/Node.hpp"
+	"Simulator/NetworkGrid.cpp"
+	"Simulator/NetworkGrid.hpp"
 )
 
 # Setup the library information.
