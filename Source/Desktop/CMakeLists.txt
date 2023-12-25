@@ -15,6 +15,10 @@ set(
 	"Simulator/Node.hpp"
 	"Simulator/NetworkGrid.cpp"
 	"Simulator/NetworkGrid.hpp"
+	"Simulator/RandomizedRouterNode.cpp"
+	"Simulator/RandomizedRouterNode.hpp"
+	"Simulator/Message.cpp"
+	"Simulator/Message.hpp"
 )
 
 # Setup the library information.

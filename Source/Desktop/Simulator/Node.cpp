@@ -1,14 +1,29 @@
 #include "Node.hpp"
 #include "NetworkGrid.hpp"
 
+#include <iostream>
+
 namespace HiveCom
 {
     void Node::onMessageReceived(const Message &message)
     {
-        // If we're not the destination, check if the destination is in our list.
-        if (message.m_destination != m_identifier)
+        m_reactor.execute([this, message]
+                          { handleMessage(message); });
+    }
+
+    void Node::handleMessage(const Message &message)
+    {
+        // Check if this is the required destination.
+        if (message.m_destination == m_identifier)
         {
-            for (const auto &connection : m_connections)
+            // TODO: Notify the network grid that the message was received.
+            std::cout << "Message received! Message: " << message.m_message << std::endl;
+            std::cout << "Travel time: " << message.getTravelTime() << std::endl;
+        }
+        else
+        {
+            // If not check if the destination is in the connection list.
+            for (const auto connection : m_connections)
             {
                 if (message.m_destination == connection)
                 {
@@ -17,12 +32,8 @@ namespace HiveCom
                 }
             }
 
-            // If it's not in the network list, send it to a random person in our connection list.
-            
-        }
-        else
-        {
-            // TODO: Notify the network grid that the message was received.
+            // If not, route the message through the network.
+            route(message);
         }
     }
 } // namespace HiveCom
