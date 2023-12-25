@@ -1,6 +1,3 @@
 #pragma once
 
-namespace HiveCom 
-{
-	
-}
+namespace HiveCom {}

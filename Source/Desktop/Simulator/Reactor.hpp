@@ -1,45 +1,46 @@
 #pragma once
 
-#include <thread>
-#include <functional>
-#include <list>
 #include <atomic>
 #include <condition_variable>
-#include <mutex>
+#include <functional>
 #include <latch>
+#include <list>
+#include <mutex>
+#include <thread>
 
-namespace HiveCom
-{
-	/// @brief Reactor class.
-	/// This class contains a single worker thread and will remain blocked while a task is assigned to it.
-	class Reactor final
-	{
-		using TaskType = std::function<void()>;
 
-	public:
-		/// @brief Default constructor.
-		Reactor();
+namespace HiveCom {
+/// @brief Reactor class.
+/// This class contains a single worker thread and will remain blocked while a
+/// task is assigned to it.
+class Reactor final {
+  using TaskType = std::function<void()>;
 
-		/// @brief Default destructor.
-		~Reactor();
+public:
+  /// @brief Default constructor.
+  Reactor();
 
-		/// @brief Execute a new task.
-		/// @param task The task to be executed asynchronously.
-		void execute(TaskType task);
+  /// @brief Default destructor.
+  ~Reactor();
 
-	private:
-		/// @brief  Worker method function.
-		/// This function is called by the worker thread and will execute the tasks accordingly.
-		void workerMethod();
+  /// @brief Execute a new task.
+  /// @param task The task to be executed asynchronously.
+  void execute(TaskType task);
 
-	private:
-		std::thread m_worker;
-		std::list<TaskType> m_tasks;
+private:
+  /// @brief  Worker method function.
+  /// This function is called by the worker thread and will execute the tasks
+  /// accordingly.
+  void workerMethod();
 
-		std::mutex m_mutex;
-		std::latch m_startLatch = std::latch(1);
+private:
+  std::thread m_worker;
+  std::list<TaskType> m_tasks;
 
-		std::atomic_bool m_bShouldRun = true;
-		std::condition_variable m_conditionVariable;
-	};
-}
+  std::mutex m_mutex;
+  std::latch m_startLatch = std::latch(1);
+
+  std::atomic_bool m_bShouldRun = true;
+  std::condition_variable m_conditionVariable;
+};
+} // namespace HiveCom
