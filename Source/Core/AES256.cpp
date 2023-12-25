@@ -1,3 +1,5 @@
 #include "AES256.hpp"
 
-namespace HiveCom {}
+namespace HiveCom
+{
+}
