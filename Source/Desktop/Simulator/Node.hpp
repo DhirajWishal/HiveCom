@@ -33,9 +33,12 @@ namespace HiveCom
         /// @return The connections.
         [[nodiscard]] const std::vector<std::string> &getConnections() const { return m_connections; }
 
+        void onHandshake() {}
+        void onKeepAlive() {}
+
         /// @brief Handle a message that is received by the current node.
         /// @param message The message that has been received.
-        void onMessageReceived(Message &message);
+        void onMessageReceived(const MessagePtr& message);
 
     protected:
         /// @brief Pure virtual route method.
@@ -43,12 +46,12 @@ namespace HiveCom
         /// It is invoked if the current node is not the destination or if the destination is not within
         /// the connections list.
         /// @param message The message to be routed.
-        virtual void route(Message &message) = 0;
+        virtual void route(const MessagePtr& message) = 0;
 
     private:
         /// @brief Handle the incoming message in another thread.
         /// @param message The message to handle.
-        void handleMessage(Message &message);
+        void handleMessage(const MessagePtr& message);
 
     private:
         Reactor m_reactor;

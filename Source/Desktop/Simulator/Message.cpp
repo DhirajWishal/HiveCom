@@ -11,6 +11,11 @@ namespace HiveCom
     {
     }
 
+    Message::Message(std::string_view source, std::string_view destination, MessageFlag flags)
+        : m_latch(0), m_source(source.data()), m_destination(destination.data()), m_timestamp(CURRENT_TIME), m_flags(flags)
+    {
+    }
+
     uint64_t Message::getTravelTime() const
     {
         return CURRENT_TIME - m_timestamp;

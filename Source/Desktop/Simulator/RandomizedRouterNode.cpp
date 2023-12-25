@@ -3,7 +3,7 @@
 
 namespace HiveCom
 {
-    void RandomizedRouterNode::route(Message &message)
+    void RandomizedRouterNode::route(const MessagePtr& message)
     {
         const auto index = m_engine() % m_connections.size();
         m_pNetworkGrid->sendMessage(message, m_connections[index]);

@@ -25,7 +25,7 @@ int main()
                                      },
                                      HiveCom::NodeBuilder<HiveCom::RandomizedRouterNode>());
 
-    auto message = HiveCom::Message("N", "M", "Hello world");
+    auto message = std::make_shared<HiveCom::Message>("N", "M", "Hello world");
     grid.sendMessage(message);
-    message.wait();
+    message->wait();
 }
