@@ -6,7 +6,7 @@
 int main()
 {
     auto grid = HiveCom::NetworkGrid({
-                                         HiveCom::Connection("A", "BDNO"),
+                                         HiveCom::Connection("A", "BDNO"), // Root node.
                                          HiveCom::Connection("B", "ACFO"),
                                          HiveCom::Connection("C", "B"),
                                          HiveCom::Connection("D", "AE"),
@@ -25,7 +25,7 @@ int main()
                                      },
                                      HiveCom::NodeBuilder<HiveCom::RandomizedRouterNode>());
 
-    const auto message = HiveCom::Message("N", "M", "Hello world");
-
+    auto message = HiveCom::Message("N", "M", "Hello world");
     grid.sendMessage(message);
+    message.wait();
 }

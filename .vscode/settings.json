@@ -86,6 +86,7 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "random": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "barrier": "cpp"
     }
 }

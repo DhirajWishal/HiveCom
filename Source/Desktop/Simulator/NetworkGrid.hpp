@@ -68,12 +68,12 @@ namespace HiveCom
 
         /// @brief Send a message through the network.
         /// @param message The message to be sent.
-        void sendMessage(const Message &message);
+        void sendMessage(Message &message);
 
         /// @brief Send a message through the network.
         /// @param message The message to be sent.
         /// @param hop The immediate hope that handles this message.
-        void sendMessage(const Message &message, std::string_view hop);
+        void sendMessage(Message &message, std::string_view hop);
 
     private:
         std::unordered_map<std::string, std::unique_ptr<Node>> m_nodeMap;

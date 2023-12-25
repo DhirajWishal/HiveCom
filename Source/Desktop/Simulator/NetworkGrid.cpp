@@ -27,13 +27,13 @@ namespace HiveCom
     //         m_rootNode = connections.front().m_source;
     // }
 
-    void NetworkGrid::sendMessage(const Message &message)
+    void NetworkGrid::sendMessage(Message &message)
     {
         assert(!m_nodeMap.empty());
         m_nodeMap[m_rootNode]->onMessageReceived(message);
     }
 
-    void NetworkGrid::sendMessage(const Message &message, std::string_view hop)
+    void NetworkGrid::sendMessage(Message &message, std::string_view hop)
     {
         assert(!m_nodeMap.empty());
         m_nodeMap[hop.data()]->onMessageReceived(message);

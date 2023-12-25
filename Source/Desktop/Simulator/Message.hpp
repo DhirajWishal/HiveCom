@@ -1,14 +1,16 @@
 #pragma once
 
 #include <string>
+#include <latch>
 
 namespace HiveCom
 {
-    /// @brief Message structure.
+    /// @brief Message class.
     /// This contains information about the source, destination and the information that is being
     /// communicated.
-    struct Message final
+    class Message final
     {
+    public:
         /// @brief Default constructor.
         Message() = default;
 
@@ -18,16 +20,38 @@ namespace HiveCom
         /// @param message The message to be sent.
         explicit Message(std::string_view source, std::string_view destination, std::string_view message);
 
+        /// @brief Get the source of the message.
+        /// @return Source string view.
+        [[nodiscard]] std::string_view getSource() const { return m_source; }
+
+        /// @brief Get the destination of the message.
+        /// @return Destination string view.
+        [[nodiscard]] std::string_view getDestination() const { return m_destination; }
+
+        /// @brief Get the message content.
+        /// @return The message contents.
+        [[nodiscard]] std::string_view getMessage() const { return m_message; }
+
         /// @brief Find the travel time taken by the packet to get to the destination.
         /// This does not validate the destination, it'll give the time from the creation to this function call.
-        /// @return The time duration.
+        /// @return The time duration in nanoseconds.
         [[nodiscard]] uint64_t getTravelTime() const;
+
+        /// @brief Received function.
+        /// This function is called by the node when it is at the destination.
+        void received();
+
+        /// @brief Wait function.
+        /// The sender can use this method to wait till the message is received.
+        void wait() const;
+
+    private:
+        std::latch m_latch;
 
         std::string m_source;
         std::string m_destination;
         std::string m_message;
 
-    private:
         uint64_t m_timestamp = 0;
     };
 } // namespace HiveCom

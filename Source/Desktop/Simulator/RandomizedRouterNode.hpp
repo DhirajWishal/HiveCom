@@ -18,7 +18,7 @@ namespace HiveCom
         /// @brief Route method.
         /// This method will send the incoming message to a random connection.
         /// @param message The message to route.
-        void route(const Message &message) override;
+        void route(Message &message) override;
 
     private:
         std::default_random_engine m_engine;

@@ -35,7 +35,7 @@ namespace HiveCom
 
         /// @brief Handle a message that is received by the current node.
         /// @param message The message that has been received.
-        void onMessageReceived(const Message &message);
+        void onMessageReceived(Message &message);
 
     protected:
         /// @brief Pure virtual route method.
@@ -43,12 +43,12 @@ namespace HiveCom
         /// It is invoked if the current node is not the destination or if the destination is not within
         /// the connections list.
         /// @param message The message to be routed.
-        virtual void route(const Message &message) = 0;
+        virtual void route(Message &message) = 0;
 
     private:
         /// @brief Handle the incoming message in another thread.
         /// @param message The message to handle.
-        void handleMessage(const Message &message);
+        void handleMessage(Message &message);
 
     private:
         Reactor m_reactor;
