@@ -28,6 +28,9 @@ namespace HiveCom
         {
         }
 
+        /// @brief Virtual destructor.
+        virtual ~Node() = default;
+
         /// @brief Get the node identifier.
         /// @return The identifier string view.
         [[nodiscard]] std::string_view getIdentifier() const
