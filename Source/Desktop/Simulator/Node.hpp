@@ -33,6 +33,14 @@ namespace HiveCom
         std::string m_message;
     };
 
+    /// @brief Routing protocol function.
+    /// The protocol to route the incoming message is defined using this callable type. It will be called by
+    /// the node when a message was received and if it isn't the intended receiver.
+    /// @param %1 The incoming message.
+    /// @param %2 All the possible connections to which we can route the message to.
+    /// @param %3 The network grid to transmit the message through.
+    using RoutingProtocol = std::function<void(const Message &, const std::vector<std::string> &, NetworkGrid *)>;
+
     /// @brief Node class.
     /// This class contains information about a single node in a communications network.
     class Node final
