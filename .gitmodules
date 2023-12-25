@@ -4,6 +4,3 @@
 [submodule "ThirdParty/liboqs"]
 	path = ThirdParty/liboqs
 	url = https://github.com/open-quantum-safe/liboqs
-[submodule "ThirdParty/botan"]
-	path = ThirdParty/botan
-	url = https://github.com/randombit/botan

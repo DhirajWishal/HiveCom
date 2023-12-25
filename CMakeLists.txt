@@ -10,7 +10,7 @@ project(
 	DESCRIPTION "Secure communications protocol for drones based on a flying ad hoc network"
 )
 
-find_package(OpenSSL 3.0.0 REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 # Set global flags.
 set(CMAKE_CXX_STANDARD 20)
