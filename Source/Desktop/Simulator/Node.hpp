@@ -64,6 +64,10 @@ namespace HiveCom
         /// @param shouldAck If we should send an acknowledgement packet.
         void handleMessageAccepted(const MessagePtr &message, bool shouldAck);
 
+        /// @brief Handle routing and forward the message to a connected node.
+        /// @param message The message to handle.
+        void handleRouting(const MessagePtr &message);
+
         /// @brief Handle an acknowledgement message received by the current node.
         /// @param message The message to handle.
         void onAcknowledgementReceived(const MessagePtr &message);

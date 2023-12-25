@@ -54,28 +54,30 @@ namespace HiveCom
         }
     }
 
+    void Node::handleRouting(const MessagePtr &message)
+    {
+        // Check if the destination is in the connection list.
+        for (const auto connection : m_connections)
+        {
+            if (message->getDestination() == connection)
+            {
+                m_pNetworkGrid->sendMessage(message, connection);
+                return;
+            }
+        }
+
+        // If not, route the message through the network.
+        route(message);
+    }
+
     void Node::onAcknowledgementReceived(const MessagePtr &message)
     {
         // Check if this is the required destination.
         if (message->getDestination() == m_identifier)
-        {
             handleMessageAccepted(message, false);
-        }
-        else
-        {
-            // If not check if the destination is in the connection list.
-            for (const auto connection : m_connections)
-            {
-                if (message->getDestination() == connection)
-                {
-                    m_pNetworkGrid->sendMessage(message, connection);
-                    return;
-                }
-            }
 
-            // If not, route the message through the network.
-            route(message);
-        }
+        else
+            handleRouting(message);
     }
 
     void Node::onDiscoveryReceived(const MessagePtr &message)
@@ -94,23 +96,9 @@ namespace HiveCom
     {
         // Check if this is the required destination.
         if (message->getDestination() == m_identifier)
-        {
             handleMessageAccepted(message, true);
-        }
-        else
-        {
-            // If not check if the destination is in the connection list.
-            for (const auto connection : m_connections)
-            {
-                if (message->getDestination() == connection)
-                {
-                    m_pNetworkGrid->sendMessage(message, connection);
-                    return;
-                }
-            }
 
-            // If not, route the message through the network.
-            route(message);
-        }
+        else
+            handleRouting(message);
     }
 } // namespace HiveCom
