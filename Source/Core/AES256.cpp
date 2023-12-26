@@ -11,8 +11,6 @@ namespace HiveCom
 {
     void AES256::encrypt(const Bytes &bytes, Byte padding /*= Byte()*/)
     {
-        int len = 0, ciphertext_len = 0;
-
         // Create the pContext.
         EVP_CIPHER_CTX *pContext = nullptr;
         if (!(pContext = EVP_CIPHER_CTX_new()))
@@ -28,9 +26,10 @@ namespace HiveCom
         validate(EVP_EncryptInit_ex(pContext, nullptr, nullptr, m_key.getKey().data(), m_key.getIV().data()));
 
         /// Provide the authentication data.
+        int length = 0;
         if (m_key.getAuthentication().size() > 0)
         {
-            validate(EVP_EncryptUpdate(pContext, nullptr, &len, m_key.getAuthentication().data(),
+            validate(EVP_EncryptUpdate(pContext, nullptr, &length, m_key.getAuthentication().data(),
                                        m_key.getAuthentication().size()));
         }
 
@@ -38,16 +37,18 @@ namespace HiveCom
         for (const auto block : splitBytes(bytes, padding))
         {
             Bytes ciphertext = Bytes(BlockSize, padding);
-            validate(EVP_EncryptUpdate(pContext, ciphertext.data(), &len, block.data(), block.size()));
-            ciphertext_len = len;
-
-            // Finalize the encryption.
-            validate(EVP_EncryptFinal_ex(pContext, ciphertext.data() + len, &len));
-            ciphertext_len += len;
+            validate(EVP_EncryptUpdate(pContext, ciphertext.data(), &length, block.data(), block.size()));
 
             // Append the ciphertext.
             m_cipherText += ciphertext;
         }
+
+        // Finalize the encryption.
+        Bytes ciphertext = Bytes(BlockSize, padding);
+        validate(EVP_EncryptFinal_ex(pContext, ciphertext.data(), &length));
+
+        if (length > 0)
+            m_cipherText += ciphertext;
 
         // Get the GCM tag.
         FixedBytes<16> tag;
@@ -59,8 +60,6 @@ namespace HiveCom
 
     Bytes AES256::decrypt(Byte padding /*= Byte()*/) const
     {
-        int len = 0, plaintext_len = 0, ret;
-
         // Crate the pContext.
         EVP_CIPHER_CTX *pContext = nullptr;
         if (!(pContext = EVP_CIPHER_CTX_new()))
@@ -76,9 +75,10 @@ namespace HiveCom
         validate(EVP_DecryptInit_ex(pContext, nullptr, nullptr, m_key.getKey().data(), m_key.getIV().data()));
 
         // Provide the authentication data.
+        int length = 0;
         if (m_key.getAuthentication().size())
         {
-            validate(EVP_DecryptUpdate(pContext, nullptr, &len, m_key.getAuthentication().data(),
+            validate(EVP_DecryptUpdate(pContext, nullptr, &length, m_key.getAuthentication().data(),
                                        m_key.getAuthentication().size()));
         }
 
@@ -87,24 +87,27 @@ namespace HiveCom
         for (const auto block : splitBytes(m_cipherText, padding))
         {
             Bytes plaintextBlock(BlockSize, padding);
-            validate(EVP_DecryptUpdate(pContext, plaintextBlock.data(), &len, block.data(), block.size()));
+            validate(EVP_DecryptUpdate(pContext, plaintextBlock.data(), &length, block.data(), block.size()));
 
-            plaintext_len = len;
             plaintext += plaintextBlock;
         }
 
-        // Set the tag value.
+        // Finalize the decryption.
+        Bytes plaintextBlock(BlockSize, padding);
+        EVP_DecryptFinal_ex(pContext, plaintextBlock.data(), &length);
+
+        if (length > 0)
+            plaintext += plaintextBlock;
+
+        // Get the tag value.
         FixedBytes<16> tag;
         validate(EVP_CIPHER_CTX_ctrl(pContext, EVP_CTRL_GCM_SET_TAG, tag.size(), tag.data()));
-
-        // Finalize the decryption.
-        ret = EVP_DecryptFinal_ex(pContext, plaintext.data() + len, &len);
 
         // Free the previously created pContext.
         EVP_CIPHER_CTX_free(pContext);
 
         // Remove padding and return.
-        plaintext.erase(plaintext.find_first_of(padding));
+        removePadding(plaintext, padding);
         return plaintext;
     }
 
@@ -141,10 +144,12 @@ namespace HiveCom
 
         // Else split and add them to multiple blocks.
         std::size_t offset = 0;
-        std::vector<ByteBlock> blocks(bytes.size() / BlockSize);
+        const auto requiredBlocks = static_cast<std::size_t>(std::ceil(bytes.size() / static_cast<float>(BlockSize)));
+        std::vector<ByteBlock> blocks(requiredBlocks);
         for (auto &block : blocks)
         {
-            const auto copySize = bytes.size() - offset > BlockSize ? BlockSize : bytes.size();
+            const auto remainingBytes = bytes.size() - offset;
+            const auto copySize = remainingBytes > BlockSize ? BlockSize : remainingBytes;
             const auto subString = bytes.substr(offset, copySize);
 
             // Copy the data.
@@ -157,5 +162,17 @@ namespace HiveCom
         }
 
         return blocks;
+    }
+
+    void AES256::removePadding(Bytes &bytes, Byte padding) const
+    {
+        for (auto i = bytes.size() - 1; i >= 0; i--)
+        {
+            if (bytes[i] != padding)
+            {
+                bytes.erase(i + 1);
+                return;
+            }
+        }
     }
 } // namespace HiveCom

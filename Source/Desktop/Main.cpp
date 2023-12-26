@@ -14,6 +14,14 @@ void printBytes(HiveCom::ByteView view)
 
 void TestEncryption()
 {
+    constexpr auto InputData = R"(
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
+        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
+        nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate 
+        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
+        sunt in culpa qui officia deserunt mollit anim id est laborum.
+    )";
+
     // AES256 test.
     HiveCom::KeyAES256::KeyType key = HiveCom::ToFixedBytes("01234567890123456789012345678901");
     HiveCom::KeyAES256::IVType iv = HiveCom::ToFixedBytes("0123456789012345");
@@ -21,7 +29,7 @@ void TestEncryption()
 
     const auto aesKey = HiveCom::KeyAES256(key, iv, HiveCom::ToBytes("Hello World"));
     auto encryption = HiveCom::AES256(aesKey);
-    encryption.encrypt(HiveCom::ToBytes("Hello World"));
+    encryption.encrypt(HiveCom::ToBytes(InputData));
 
     std::cout << "Encrypted bytes: ";
     printBytes(encryption.getCiphertext());
@@ -32,11 +40,10 @@ void TestEncryption()
 
     // Base64 test.
     const auto decoded = HiveCom::Base64(plaintext);
-    std::cout << "Encoded bytes: ";
-    printBytes(decoded.encode());
-    std::cout << std::endl;
+    const auto encodedData = decoded.encode();
+    std::cout << "Encoded bytes: " << HiveCom::ToString(encodedData) << std::endl;
 
-    const auto encoded = HiveCom::Base64(decoded.encode());
+    const auto encoded = HiveCom::Base64(encodedData);
     std::cout << "Decoded bytes: " << HiveCom::ToString(encoded.decode()) << std::endl;
 }
 

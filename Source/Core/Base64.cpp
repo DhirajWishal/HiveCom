@@ -13,11 +13,8 @@ namespace HiveCom
         if (m_bytes.empty())
             return {};
 
-        const auto expectedResult = 4 * ((m_bytes.size() + 2) / 3);
-        Bytes bytes(expectedResult, 0);
-        const auto result = EVP_EncodeBlock(bytes.data(), m_bytes.data(), m_bytes.size());
-        if (bytes.size() != result)
-            return {};
+        Bytes bytes(4 * ((m_bytes.size() + 2) / 3), 0);
+        validate(bytes.size() == EVP_EncodeBlock(bytes.data(), m_bytes.data(), m_bytes.size()));
 
         return bytes;
     }
@@ -28,11 +25,8 @@ namespace HiveCom
         if (m_bytes.empty())
             return {};
 
-        const auto expectedResult = 3 * m_bytes.size() / 4;
-        Bytes bytes(expectedResult, 0);
-        const auto result = EVP_DecodeBlock(bytes.data(), m_bytes.data(), m_bytes.size());
-        if (bytes.size() != result)
-            return {};
+        Bytes bytes(3 * m_bytes.size() / 4, 0);
+        validate(bytes.size() == EVP_DecodeBlock(bytes.data(), m_bytes.data(), m_bytes.size()));
 
         return bytes;
     }

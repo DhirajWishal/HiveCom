@@ -52,6 +52,12 @@ namespace HiveCom
         /// @return The byte blocks.
         [[nodiscard]] std::vector<ByteBlock> splitBytes(ByteView bytes, Byte padding) const;
 
+        /// @brief Remove padding in bytes.
+        /// This will remove paddings in the end of the bytes.
+        /// @param bytes The bytes to remove the padding in.
+        /// @param padding The padding byte.
+        void removePadding(Bytes &bytes, Byte padding) const;
+
       private:
         KeyAES256 m_key;
         Bytes m_cipherText;
