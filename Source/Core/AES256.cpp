@@ -1,6 +1,7 @@
 #include "AES256.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 #include <openssl/aes.h>
