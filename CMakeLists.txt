@@ -30,3 +30,11 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/liboqs)
 # Add the subdirectories.
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Source/Core)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Source/Desktop)
+
+# Setup the compile_flags.txt file to assist clangd.
+file(
+    WRITE ${CMAKE_CURRENT_SOURCE_DIR}/compile_flags.txt
+
+    "-I${LIBOQS_INCLUDE_DIR}\n"
+    "-I${OPENSSL_INCLUDE_DIR}\n"
+)

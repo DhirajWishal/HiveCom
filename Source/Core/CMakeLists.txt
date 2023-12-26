@@ -19,10 +19,36 @@ add_library(
 	${SOURCES}
 )
 
-target_link_libraries(Core oqs)
+# Setup OpenSSL library.
+set(OPENSSL_LIBRARY OpenSSL::SSL)
 
+if (DEFINED OPENSSL_SSL_LIBRARIES)
+    message(STATUS "OpenSSL SSL libraries found.")
+
+elseif (DEFINED OPENSSL_CRYPTO_LIBRARIES)
+    message(STATUS "OpenSSL crypto libraries found.")
+    set(OPENSSL_LIBRARY OpenSSL::Crypto)
+
+elseif (DEFINED OPENSSL_APPLINK_SOURCE)
+    message(STATUS "OpenSSL applink libraries found.")
+    set(OPENSSL_LIBRARY OpenSSL::applink)
+
+else ()
+    message(FATAL_ERROR "No valid OpenSSL library found!")
+endif()
+
+# Setup the link libraries.
+target_link_libraries(
+    Core 
+    
+    PRIVATE oqs
+    PRIVATE ${OPENSSL_LIBRARY}
+)
+
+# Setup include directories.
 target_include_directories(
     Core 
     
     PUBLIC ${LIBOQS_INCLUDE_DIR}
+    PUBLIC ${OPENSSL_INCLUDE_DIR}
 )

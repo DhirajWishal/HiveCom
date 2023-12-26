@@ -1,6 +1,7 @@
 #include "AES256.hpp"
 
 #include <oqs/aes.h>
+#include <openssl/aes.h>
 
 namespace HiveCom
 {

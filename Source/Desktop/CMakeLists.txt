@@ -27,3 +27,6 @@ add_executable(
 
 	${SOURCES}
 )
+
+# Setup the link libraries.
+target_link_libraries(Desktop Core)
