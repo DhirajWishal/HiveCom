@@ -33,12 +33,36 @@ namespace HiveCom
     /// @tparam Size The string size constant.
     /// @param string The incoming string.
     /// @return The converted fixed bytes.
-    template <std::size_t Size> inline FixedBytes<Size - 1> ToFixedBytes(const char (&string)[Size])
+    template <std::size_t Size> FixedBytes<Size - 1> ToFixedBytes(const char (&string)[Size])
     {
         FixedBytes<Size - 1> bytes;
         for (std::size_t i = 0; i < Size - 1; i++)
             bytes[i] = string[i];
 
         return bytes;
+    }
+
+    /// @brief Convert a bytes to a string.
+    /// @param bytes The bytes to convert.
+    /// @return The converted string.
+    inline std::string ToString(ByteView bytes)
+    {
+        return std::string(bytes.begin(), bytes.end());
+    }
+
+    /// @brief Convert fixed bytes to a string.
+    /// @param bytes The bytes to convert.
+    /// @return The converted string.
+    template <std::size_t Size> inline std::string ToString(const FixedBytes<Size> &bytes)
+    {
+        return std::string(bytes.begin(), bytes.end());
+    }
+
+    /// @brief Convert fixed bytes to a byte view.
+    /// @param bytes The bytes to convert.
+    /// @return The converted view.
+    template <std::size_t Size> inline ByteView ToView(const FixedBytes<Size> &bytes)
+    {
+        return ByteView(bytes.data(), bytes.size());
     }
 } // namespace HiveCom

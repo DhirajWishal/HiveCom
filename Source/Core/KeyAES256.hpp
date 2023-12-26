@@ -34,14 +34,14 @@ namespace HiveCom
         /// @return The key view.
         [[nodiscard]] ByteView getKey() const
         {
-            return ByteView(m_key.begin(), m_key.end());
+            return ToView(m_key);
         }
 
         /// @brief Get the initialization vector.
         /// @return The initialization vector view.
         [[nodiscard]] ByteView getIV() const
         {
-            return ByteView(m_iv.begin(), m_iv.end());
+            return ToView(m_iv);
         }
 
         /// @brief Get the authentication bytes.

@@ -4,9 +4,17 @@
 #include "Simulator/RandomizedRouterNode.hpp"
 
 #include "../Core/AES256.hpp"
+#include "../Core/Base64.hpp"
+
+void printBytes(HiveCom::ByteView view)
+{
+    for (const auto byte : view)
+        std::cout << static_cast<int>(byte);
+}
 
 void TestEncryption()
 {
+    // AES256 test.
     HiveCom::KeyAES256::KeyType key = HiveCom::ToFixedBytes("01234567890123456789012345678901");
     HiveCom::KeyAES256::IVType iv = HiveCom::ToFixedBytes("0123456789012345");
     HiveCom::KeyAES256::AuthType auth = {};
@@ -16,17 +24,20 @@ void TestEncryption()
     encryption.encrypt(HiveCom::ToBytes("Hello World"));
 
     std::cout << "Encrypted bytes: ";
-    for (const auto byte : encryption.getCiphertext())
-        std::cout << static_cast<int>(byte);
-
+    printBytes(encryption.getCiphertext());
     std::cout << std::endl;
 
     const auto plaintext = encryption.decrypt();
-    std::cout << "Decrypted bytes: ";
-    for (const auto byte : plaintext)
-        std::cout << static_cast<char>(byte);
+    std::cout << "Decrypted bytes: " << HiveCom::ToString(plaintext) << std::endl;
 
+    // Base64 test.
+    const auto decoded = HiveCom::Base64(plaintext);
+    std::cout << "Encoded bytes: ";
+    printBytes(decoded.encode());
     std::cout << std::endl;
+
+    const auto encoded = HiveCom::Base64(decoded.encode());
+    std::cout << "Decoded bytes: " << HiveCom::ToString(encoded.decode()) << std::endl;
 }
 
 void TestNetworking()

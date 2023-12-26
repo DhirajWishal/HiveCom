@@ -14,6 +14,8 @@ set(
     "Types.hpp"
     "Initializer.cpp"
 	"Initializer.hpp"
+    "Base64.cpp"
+	"Base64.hpp"
 )
 
 # Setup the library information.
