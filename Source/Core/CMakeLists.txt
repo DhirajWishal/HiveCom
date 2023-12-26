@@ -9,6 +9,11 @@ set(
 
 	"AES256.cpp"
 	"AES256.hpp"
+    "Key.hpp"
+    "KeyAES256.hpp"
+    "Types.hpp"
+    "Initializer.cpp"
+	"Initializer.hpp"
 )
 
 # Setup the library information.
