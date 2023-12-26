@@ -45,12 +45,9 @@ namespace HiveCom
 
         unsigned long errCode = 0;
 
-        printf("An error occurred\n");
+        std::cerr << "An error occurred!" << std::endl;
         while ((errCode = ERR_get_error()))
-        {
-            char *err = ERR_error_string(errCode, NULL);
-            printf("%s\n", err);
-        }
+            std::cerr << ERR_error_string(errCode, nullptr) << std::endl;
 
         abort();
     }

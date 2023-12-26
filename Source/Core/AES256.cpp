@@ -1,6 +1,7 @@
 #include "AES256.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 #include <openssl/aes.h>
 #include <openssl/err.h>
@@ -115,12 +116,9 @@ namespace HiveCom
 
         unsigned long errCode = 0;
 
-        printf("An error occurred\n");
+        std::cerr << "An error occurred!" << std::endl;
         while ((errCode = ERR_get_error()))
-        {
-            char *err = ERR_error_string(errCode, NULL);
-            printf("%s\n", err);
-        }
+            std::cerr << ERR_error_string(errCode, nullptr) << std::endl;
 
         abort();
     }
@@ -131,10 +129,12 @@ namespace HiveCom
         if (bytes.size() < BlockSize)
         {
             ByteBlock block;
-            block.fill(padding);
 
             // Copy the data.
             std::copy_n(bytes.begin(), bytes.size(), block.begin());
+
+            // Add padding if necessary.
+            std::fill_n(block.data() + bytes.size(), BlockSize - bytes.size(), padding);
 
             return {block};
         }
