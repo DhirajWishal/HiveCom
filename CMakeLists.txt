@@ -35,6 +35,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Source/Desktop)
 file(
     WRITE ${CMAKE_CURRENT_SOURCE_DIR}/compile_flags.txt
 
+    "-std=c++${CMAKE_CXX_STANDARD}\n"
     "-I${LIBOQS_INCLUDE_DIR}\n"
     "-I${OPENSSL_INCLUDE_DIR}\n"
 )
