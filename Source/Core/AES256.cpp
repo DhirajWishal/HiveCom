@@ -128,21 +128,6 @@ namespace HiveCom
 
     std::vector<AES256::ByteBlock> AES256::splitBytes(ByteView bytes, Byte padding) const
     {
-        // Check if the incoming bytes are less than a block size.
-        if (bytes.size() < BlockSize)
-        {
-            ByteBlock block;
-
-            // Copy the data.
-            std::copy_n(bytes.begin(), bytes.size(), block.begin());
-
-            // Add padding if necessary.
-            std::fill_n(block.data() + bytes.size(), BlockSize - bytes.size(), padding);
-
-            return {block};
-        }
-
-        // Else split and add them to multiple blocks.
         std::size_t offset = 0;
         const auto requiredBlocks = static_cast<std::size_t>(std::ceil(bytes.size() / static_cast<float>(BlockSize)));
         std::vector<ByteBlock> blocks(requiredBlocks);
