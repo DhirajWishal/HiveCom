@@ -37,7 +37,7 @@ namespace HiveCom
     {
         FixedBytes<Size - 1> bytes;
         for (std::size_t i = 0; i < Size - 1; i++)
-            bytes[i] = string[i];
+            bytes[i] = static_cast<Byte>(string[i]);
 
         return bytes;
     }
@@ -49,8 +49,8 @@ namespace HiveCom
     template <std::size_t Size> FixedBytes<Size> ToFixedBytes(const ByteView &input)
     {
         FixedBytes<Size> bytes;
-        for (std::size_t i = 0; i < Size - 1; i++)
-            bytes[i] = input[i];
+        for (std::size_t i = 0; i < Size; i++)
+            bytes[i] = static_cast<Byte>(input[i]);
 
         return bytes;
     }

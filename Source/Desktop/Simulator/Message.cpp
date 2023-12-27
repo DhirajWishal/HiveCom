@@ -40,6 +40,14 @@ namespace HiveCom
         g_ActiveMessageBlock.increment();
     }
 
+    std::shared_ptr<Message> Message::createAcknowledgementPacket() const
+    {
+        const auto ptr = std::make_shared<Message>(m_destination, m_source, MessageFlag::Acknowledgement);
+        ptr->m_timestamp = m_timestamp;
+
+        return ptr;
+    }
+
     void Message::setMessage(const std::string &message)
     {
         m_message = message;

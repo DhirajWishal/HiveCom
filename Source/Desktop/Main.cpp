@@ -101,6 +101,11 @@ void TestCertificate()
     const auto certificate =
         HiveCom::Certificate(1, "0001", "HiveCom", kemKey.getPublicKey(), authKey.getPrivateKey(), dilithium);
     std::cout << "Certificate: " << std::endl << certificate.getCertificate() << std::endl;
+    std::cout << "Certificate decode valid: "
+              << (HiveCom::Certificate(certificate.getCertificate(), authKey.getPublicKey(), dilithium).isValid()
+                      ? "True"
+                      : "False")
+              << std::endl;
 }
 
 void TestNetworkingSimple()

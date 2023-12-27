@@ -12,7 +12,7 @@ namespace HiveCom
         : m_publicKey(ToFixedBytes<Kyber768Key::PublicKeySize>(publicKey)), m_serial(serial), m_issuerName(issuerName),
           m_version(version)
     {
-        // Setup the raw certificate.
+        // Set up the raw certificate.
         std::stringstream rawCertificate;
         rawCertificate << version << "\n";
         rawCertificate << serial << "\n";
@@ -20,8 +20,10 @@ namespace HiveCom
         rawCertificate << std::chrono::system_clock::now().time_since_epoch().count() << "\n";
         rawCertificate << ToString(Base64(publicKey).encode()) << "\n";
 
-        const auto signature = tool.sign(privateKey, ToBytes(rawCertificate.str()));
-        rawCertificate << ToString(Base64(ToView(signature)).encode()) << "\n";
+        const auto rawCertificateString = rawCertificate.str();
+        const auto signature = tool.sign(privateKey, ToBytes(rawCertificateString));
+        const auto encodedSignature = ToString(Base64(ToView(signature)).encode());
+        rawCertificate << encodedSignature << "\n";
 
         // Finalize the certificate.
         m_certificate = rawCertificate.str();
@@ -46,7 +48,6 @@ namespace HiveCom
         m_issuerName = splits[2];
         m_timestamp = splits[3];
         m_publicKey = ToFixedBytes<Kyber768Key::PublicKeySize>(Base64(ToBytes(splits[4])).decode());
-        const auto signature = ToFixedBytes<Dilithium3::SignatureSize>(Base64(ToBytes(splits[5])).decode());
 
         // Create the raw certificate.
         std::string rawCertificate;
@@ -54,6 +55,7 @@ namespace HiveCom
             rawCertificate += splits[i] + "\n";
 
         // Verify the signature. TODO: Trusted keychain check.
+        const auto signature = ToFixedBytes<Dilithium3::SignatureSize>(Base64(ToBytes(splits[5])).decode());
         m_isValid = tool.verify(publicKey, signature, ToBytes(rawCertificate)) && IsPeriodValid(m_timestamp);
     }
 
@@ -71,7 +73,7 @@ namespace HiveCom
 
     bool Certificate::IsPeriodValid(const std::string_view timestamp)
     {
-        return std::stoi(timestamp.data()) >
+        return std::stoull(timestamp.data()) >
                (std::chrono::system_clock::now() - std::chrono::months(ValidityPeriod)).time_since_epoch().count();
     }
 } // namespace HiveCom

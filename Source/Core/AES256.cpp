@@ -12,6 +12,8 @@ namespace HiveCom
 {
     void AES256::encrypt(const Bytes &bytes, Byte padding /*= Byte()*/)
     {
+        m_cipherText.clear();
+
         // Create the pContext.
         const auto pContext = EVP_CIPHER_CTX_new();
         if (!pContext)
@@ -157,11 +159,12 @@ namespace HiveCom
 
     void AES256::RemovePadding(Bytes &bytes, const Byte padding)
     {
-        for (auto i = bytes.size() - 1; i >= 0; i--)
+        std::size_t index = bytes.size() - 1;
+        for (auto itr = bytes.rbegin(); itr != bytes.rend(); ++itr, --index)
         {
-            if (bytes[i] != padding)
+            if (*itr != padding)
             {
-                bytes.erase(i + 1);
+                bytes.erase(index + 1);
                 return;
             }
         }

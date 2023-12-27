@@ -38,8 +38,8 @@ namespace HiveCom
         /// @param key The public key to verify with.
         /// @param signature The signature to verify.
         /// @param bytes The bytes to verify.
-        [[nodiscard]] bool verify(ByteView key, const SignatureType &signature,
-                                           ByteView bytes) const;
+        /// @return True if the signature is valid, else false.
+        [[nodiscard]] bool verify(ByteView key, const SignatureType &signature, ByteView bytes) const;
 
       private:
         Implementation *m_pImplementation = nullptr;

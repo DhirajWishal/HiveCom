@@ -6,13 +6,13 @@
 #include "Core/Logging.hpp"
 
 #include <memory>
+#include <sstream>
 
 namespace HiveCom
 {
     Node::Node(std::string identifier, const std::vector<std::string> &connections, NetworkGrid *pGrid)
         : m_identifier(std::move(identifier)), m_connections(connections), m_pNetworkGrid(pGrid)
     {
-        HC_LOG_INFO("Created node: {}", m_identifier);
         m_reactor.execute([this]() mutable { initialize(); });
     }
 
@@ -75,14 +75,10 @@ namespace HiveCom
 
         // Reply if this isn't an acknowledgement.
         if (shouldAck)
-        {
-            const auto ack = message->createAcknowledgementPacket();
-            handleRouting(ack);
-            ack->wait();
-        }
+            handleRouting(message->createAcknowledgementPacket());
     }
 
-    void Node::handleRouting(const MessagePtr &message)
+    Message *Node::handleRouting(const MessagePtr &message)
     {
         // Check if the destination is in the connection list.
         for (const auto &connection : m_connections)
@@ -90,22 +86,34 @@ namespace HiveCom
             if (message->getDestination() == connection)
             {
                 m_pNetworkGrid->sendMessage(message, connection);
-                return;
+                return message.get();
             }
         }
 
         // If not, route the message through the network.
         route(message);
+
+        return message.get();
     }
 
     void Node::onAcknowledgementReceived(const MessagePtr &message)
     {
         // Check if this is the required destination.
         if (message->getDestination() == m_identifier)
-            handleMessageAccepted(message, false);
+        {
+            const auto timestamp = message->getTimestamp();
+            if (m_onAcknowledgementMap.contains(timestamp))
+            {
+                m_onAcknowledgementMap[timestamp]();
+                m_onAcknowledgementMap.erase(timestamp);
+            }
 
+            message->received();
+        }
         else
+        {
             handleRouting(message);
+        }
     }
 
     void Node::onDiscoveryReceived(const MessagePtr &message)
@@ -132,16 +140,19 @@ namespace HiveCom
             {
                 const auto [secret, ciphertext] = m_kyber.encapsulate(ToView(senderCertificate.getPublicKey()));
                 const auto encodedCiphertext = ToString(Base64(ToView(ciphertext)).encode());
-                const auto response = std::string(m_certificate.getCertificate()) + "\n" + encodedCiphertext;
-
-                // Store the connection key.
-                m_connectionKeys[messageSource.data()] = AES256(
-                    AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+                const auto encodedCertificate = ToString(Base64(ToBytes(m_certificate.getCertificate())).encode());
+                const auto response = std::string(encodedCertificate) + "\n" + encodedCiphertext;
 
                 // Send the authorization data.
-                handleRouting(std::make_shared<Message>(m_identifier, messageSource.data(),
-                                                        encryptMessage(response, messageSource),
-                                                        MessageFlag::Authorization));
+                const auto timestamp = handleRouting(std::make_shared<Message>(m_identifier, messageSource.data(),
+                                                                               response, MessageFlag::Authorization))
+                                           ->getTimestamp();
+
+                m_onAcknowledgementMap[timestamp] = [this, messageSource, secret] {
+                    // Store the connection key.
+                    m_connectionKeys[messageSource.data()] =
+                        AES256(AES256Key(secret, ToFixedBytes("0123456789012345"), ToBytes("Hello World")));
+                };
             }
             else
             {
@@ -160,7 +171,7 @@ namespace HiveCom
         {
             // Extract the important information.
             const auto messageSource = message->getSource();
-            const auto content = decryptMessage(message->getMessage(), message->getSource());
+            const auto content = message->getMessage();
             const auto duration = message->getTravelTime();
             const auto seconds = static_cast<double>(duration) / 1'000'000.0;
 
@@ -180,7 +191,7 @@ namespace HiveCom
                 return;
             }
 
-            const auto &certificate = splits[0];
+            const auto certificate = ToString(Base64(ToBytes(splits[0])).decode());
             const auto &ciphertext = splits[1];
 
             // Validate the certificate.
@@ -193,8 +204,8 @@ namespace HiveCom
                                                         ToFixedBytes<Kyber768::CiphertextSize>(decodedBytes));
 
                 // Store the connection key.
-                m_connectionKeys[std::string(messageSource)] = AES256(
-                    AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+                m_connectionKeys[std::string(messageSource)] =
+                    AES256(AES256Key(secret, ToFixedBytes("0123456789012345"), ToBytes("Hello World")));
             }
             else
             {
@@ -248,8 +259,8 @@ namespace HiveCom
         if (m_connectionKeys.contains(destination.data()))
         {
             auto &engine = m_connectionKeys[destination.data()];
-            engine.setCiphertext(ToBytes(message));
-            return ToString(Base64(engine.decrypt()).encode());
+            engine.setCiphertext(Base64(ToBytes(message)).decode());
+            return ToString(engine.decrypt());
         }
 
         return message.data();

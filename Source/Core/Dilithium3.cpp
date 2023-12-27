@@ -22,6 +22,7 @@ namespace HiveCom
         /// @brief Destructor.
         ~Implementation()
         {
+            OQS_SIG_free(m_sig);
         }
 
         /// @brief Get the signature instance.
@@ -72,15 +73,14 @@ namespace HiveCom
     {
         SignatureType signature;
         std::size_t signatureLength = 0;
-        HC_OQS_ASSERT(OQS_SIG_sign(m_pImplementation->getSIG(), signature.data(), &signatureLength, bytes.data(), bytes.size(),
-                                   key.data()),
+        HC_OQS_ASSERT(OQS_SIG_sign(m_pImplementation->getSIG(), signature.data(), &signatureLength, bytes.data(),
+                                   bytes.size(), key.data()),
                       "Failed to sign the message!");
 
         return signature;
     }
 
-    bool Dilithium3::verify(const ByteView key, const SignatureType &signature,
-                            const ByteView bytes) const
+    bool Dilithium3::verify(const ByteView key, const SignatureType &signature, const ByteView bytes) const
     {
         return OQS_SIG_verify(m_pImplementation->getSIG(), bytes.data(), bytes.size(), signature.data(),
                               signature.size(), key.data()) == OQS_SUCCESS;

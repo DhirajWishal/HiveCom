@@ -72,7 +72,8 @@ namespace HiveCom
 
         /// @brief Handle routing and forward the message to a connected node.
         /// @param message The message to handle.
-        void handleRouting(const MessagePtr &message);
+        /// @return The message pointer.
+        Message *handleRouting(const MessagePtr &message);
 
         /// @brief Handle an acknowledgement message received by the current node.
         /// @param message The message to handle.
@@ -119,6 +120,7 @@ namespace HiveCom
         std::string m_identifier;
         std::vector<std::string> m_connections;
         std::unordered_map<std::string, AES256> m_connectionKeys;
+        std::unordered_map<uint64_t, std::function<void()>> m_onAcknowledgementMap;
 
         NetworkGrid *m_pNetworkGrid = nullptr;
     };

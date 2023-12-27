@@ -71,10 +71,7 @@ namespace HiveCom
 
         /// @brief Create an acknowledgement packet with the current source and destination data.
         /// @return The acknowledgement message.
-        [[nodiscard]] std::shared_ptr<Message> createAcknowledgementPacket() const
-        {
-            return std::make_shared<Message>(m_destination, m_source, MessageFlag::Acknowledgement);
-        }
+        [[nodiscard]] std::shared_ptr<Message> createAcknowledgementPacket() const;
 
         /// @brief Get the source of the message.
         /// @return Source string view.
@@ -99,6 +96,15 @@ namespace HiveCom
         [[nodiscard]] std::string_view getMessage() const
         {
             return m_message;
+        }
+
+        /// @brief Get the timestamp of the message.
+        /// Acknowledgements have the same timestamp as the previous message if `createAcknowledgementPacket()` method
+        /// is used.
+        /// @return The timestamp.
+        [[nodiscard]] uint64_t getTimestamp() const
+        {
+            return m_timestamp;
         }
 
         /// @brief Find the travel time taken by the packet to get to the destination.
