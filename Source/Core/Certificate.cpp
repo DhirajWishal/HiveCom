@@ -72,7 +72,8 @@ namespace HiveCom
 
     bool Certificate::isPeriodValid(std::string_view timestamp) const
     {
-#if defined __cpp_lib_chrono && __cpp_lib_chrono >= 201907L
+// TODO: Enable this with proper C++20 support.
+#if false
         std::istringstream stream{timestamp.data()};
 
         std::string line;
