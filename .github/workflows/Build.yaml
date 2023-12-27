@@ -36,4 +36,6 @@ jobs:
       - if: runner.os != 'Windows'
         name: Run
         run: |
-          ${{github.workspace}}/Source/Desktop/Desktop
+          ls ${{github.workspace}}/Build/Source/Desktop
+          chmode +x ${{github.workspace}}/Build/Source/Desktop/Desktop
+          ${{github.workspace}}/Build/Source/Desktop/Desktop
