@@ -150,6 +150,8 @@ void TestNetworkingComplex()
     auto message = std::make_shared<HiveCom::Message>("N", "M", "Hello world");
     grid.getNode("N")->sendMessage(message);
     message->wait();
+
+    HiveCom::g_ActiveMessageBlock.wait();
 }
 
 int main()
@@ -160,5 +162,5 @@ int main()
     TestDilithium3();
     TestCertificate();
     TestNetworkingSimple();
-    // TestNetworkingComplex(); // TODO: Add this with proper routing.
+    TestNetworkingComplex(); // TODO: Add this with proper routing.
 }
