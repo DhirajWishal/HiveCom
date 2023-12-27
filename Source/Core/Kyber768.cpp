@@ -1,13 +1,12 @@
 #include "Kyber768.hpp"
-#include "oqs/kem_kyber.h"
+#include "Logging.hpp"
 
-#include <iostream>
 #include <oqs/kem.h>
 #include <utility>
 
-#define HC_OQS_ASSERT(exp, msg)                                                                                        \
+#define HC_OQS_ASSERT(exp, ...)                                                                                        \
     if (exp != OQS_SUCCESS)                                                                                            \
-    std::cerr << msg << std::endl
+    HC_LOG_ERROR(__VA_ARGS__)
 
 namespace HiveCom
 {

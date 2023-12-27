@@ -1,6 +1,6 @@
-[submodule "ThirdParty/liboqs-cpp"]
-	path = ThirdParty/liboqs-cpp
-	url = https://github.com/open-quantum-safe/liboqs-cpp
 [submodule "ThirdParty/liboqs"]
 	path = ThirdParty/liboqs
 	url = https://github.com/open-quantum-safe/liboqs
+[submodule "ThirdParty/spdlog"]
+	path = ThirdParty/spdlog
+	url = https://github.com/gabime/spdlog

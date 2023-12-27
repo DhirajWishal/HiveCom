@@ -30,11 +30,11 @@ jobs:
         run: cmake --build ${{github.workspace}}/Build --config ${{env.BUILD_TYPE}}
     
       - if: runner.os == 'Windows'
-        name: Run
+        name: Run on Windows
         run: ${{github.workspace}}/Build/Source/Desktop/${{env.BUILD_TYPE}}/Desktop
       
       - if: runner.os != 'Windows'
-        name: Run
+        name: Run on Ubuntu and macOS
         run: |
           chmod +x ${{github.workspace}}/Build/Source/Desktop/Desktop
           ${{github.workspace}}/Build/Source/Desktop/Desktop

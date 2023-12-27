@@ -1,8 +1,8 @@
 #include "AES256.hpp"
+#include "Logging.hpp"
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 
 #include <openssl/aes.h>
 #include <openssl/err.h>
@@ -120,9 +120,9 @@ namespace HiveCom
 
         unsigned long errCode = 0;
 
-        std::cerr << "An error occurred!" << std::endl;
+        HC_LOG_ERROR("An error occurred!");
         while ((errCode = ERR_get_error()))
-            std::cerr << ERR_error_string(errCode, nullptr) << std::endl;
+            HC_LOG_ERROR("Error: {}", ERR_error_string(errCode, nullptr));
 
         abort();
     }

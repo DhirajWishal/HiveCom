@@ -19,6 +19,7 @@ set(
     "Kyber768.cpp"
 	"Kyber768.hpp"
 	"KeyKyber768.hpp"
+	"Logging.hpp"
 )
 
 # Setup the library information.
@@ -59,6 +60,7 @@ target_link_libraries(
 target_include_directories(
     Core 
     
-    PUBLIC ${LIBOQS_INCLUDE_DIR}
-    PUBLIC ${OPENSSL_INCLUDE_DIR}
+    PRIVATE ${LIBOQS_INCLUDE_DIR}
+    PRIVATE ${OPENSSL_INCLUDE_DIR}
+    PUBLIC ${SPDLOG_INCLUDE_DIR}
 )

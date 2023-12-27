@@ -1,7 +1,7 @@
 #include "Node.hpp"
 #include "NetworkGrid.hpp"
 
-#include <iostream>
+#include "../../Core/Logging.hpp"
 
 namespace HiveCom
 {
@@ -41,8 +41,8 @@ namespace HiveCom
         const auto seconds = duration / 1'000'000.0f;
 
         // TODO: Notify the network grid that the message was received.
-        std::cout << "Message received! Message: " << message->getMessage() << std::endl;
-        std::cout << "Travel time: " << duration << "ns (" << seconds << "ms)" << std::endl;
+        HC_LOG_INFO("Message received! Message: {}", message->getMessage());
+        HC_LOG_INFO("Travel time: {}ns ({}ms)", duration, seconds);
 
         // Notify that the message was received.
         message->received();

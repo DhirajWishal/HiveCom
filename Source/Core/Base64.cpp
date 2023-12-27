@@ -1,9 +1,8 @@
 #include "Base64.hpp"
+#include "Logging.hpp"
 
 #include <openssl/err.h>
 #include <openssl/evp.h>
-
-#include <iostream>
 
 namespace HiveCom
 {
@@ -39,9 +38,9 @@ namespace HiveCom
 
         unsigned long errCode = 0;
 
-        std::cerr << "An error occurred!" << std::endl;
+        HC_LOG_ERROR("An error occurred!");
         while ((errCode = ERR_get_error()))
-            std::cerr << ERR_error_string(errCode, nullptr) << std::endl;
+            HC_LOG_ERROR("Error: {}", ERR_error_string(errCode, nullptr));
 
         abort();
     }
