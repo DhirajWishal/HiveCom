@@ -7,13 +7,13 @@
 #include "../Core/Base64.hpp"
 #include "../Core/Kyber768.hpp"
 
-void printBytes(HiveCom::ByteView view)
+void PrintBytes(HiveCom::ByteView view)
 {
     for (const auto byte : view)
         std::cout << static_cast<int>(byte);
 }
 
-void TestEncryption()
+void TestAES()
 {
     // constexpr auto InputData = R"(
     //     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -25,7 +25,6 @@ void TestEncryption()
 
     constexpr auto InputData = R"(Hello world)";
 
-    // AES256 test.
     HiveCom::KeyAES256::KeyType key = HiveCom::ToFixedBytes("01234567890123456789012345678901");
     HiveCom::KeyAES256::IVType iv = HiveCom::ToFixedBytes("0123456789012345");
     HiveCom::KeyAES256::AuthType auth = {};
@@ -35,21 +34,25 @@ void TestEncryption()
     encryption.encrypt(HiveCom::ToBytes(InputData));
 
     std::cout << "Encrypted bytes: ";
-    printBytes(encryption.getCiphertext());
+    PrintBytes(encryption.getCiphertext());
     std::cout << std::endl;
 
     const auto plaintext = encryption.decrypt();
     std::cout << "Decrypted bytes: " << HiveCom::ToString(plaintext) << std::endl;
+}
 
-    // Base64 test.
-    const auto decoded = HiveCom::Base64(plaintext);
+void TestBase64()
+{
+    const auto decoded = HiveCom::Base64(HiveCom::ToBytes("Hello world"));
     const auto encodedData = decoded.encode();
     std::cout << "Encoded bytes: " << HiveCom::ToString(encodedData) << std::endl;
 
     const auto encoded = HiveCom::Base64(encodedData);
     std::cout << "Decoded bytes: " << HiveCom::ToString(encoded.decode()) << std::endl;
+}
 
-    // Kyber test.
+void TestKyber768()
+{
     HiveCom::Kyber768 kyber;
     const auto kyberKey = kyber.generateKey();
     const auto [sharedSecret, ciphertext] = kyber.encapsulate(kyberKey.getPublicKey());
@@ -62,8 +65,8 @@ void TestEncryption()
 
     std::cout << "Ciphertext: " << HiveCom::ToString(HiveCom::Base64(HiveCom::ToView(ciphertext)).encode())
               << std::endl;
-    std::cout << "Expected shared secret: " << HiveCom::ToString(HiveCom::Base64(HiveCom::ToView(sharedSecret)).encode())
-              << std::endl;
+    std::cout << "Expected shared secret: "
+              << HiveCom::ToString(HiveCom::Base64(HiveCom::ToView(sharedSecret)).encode()) << std::endl;
     std::cout << "Actual shared secret:   " << HiveCom::ToString(HiveCom::Base64(HiveCom::ToView(ddata)).encode())
               << std::endl;
 }
@@ -98,6 +101,8 @@ void TestNetworking()
 
 int main()
 {
-    TestEncryption();
-    TestNetworking();
+    TestAES();
+    TestBase64();
+    TestKyber768();
+    // TestNetworking(); // TODO: Add this with proper routing.
 }

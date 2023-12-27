@@ -28,3 +28,6 @@ jobs:
       
       - name: Build
         run: cmake --build ${{github.workspace}}/Build --config ${{env.BUILD_TYPE}}
+    
+      - name: Run
+        run: ./${{github.workspace}}/Build/Source/Desktop/${{env.BUILD_TYPE}}/Desktop

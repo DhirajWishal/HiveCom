@@ -1,5 +1,19 @@
 #pragma once
 
+///
+/// @section Key exchange mechanism
+/// This section describes how the key exchange mechanism work with the Kyber768 class.
+///
+/// Let there be two communicating parties, A and B.
+///
+/// 1. A generates a key-pair, 'pk' and 'sk' (public key and private key respectively).
+/// 2. A shares the 'pk' with B.
+/// 3. B encapsulates the 'pk' and receives ciphertext 'c' and shared secret 's'.
+/// 4. B shares the ciphertext 'c' with A.
+/// 5. A decapsulates 'c' with 'sk' and receives 's'.
+/// 6. A and B uses 's' to encrypt communications.
+///
+
 #include "KeyKyber768.hpp"
 
 namespace HiveCom
