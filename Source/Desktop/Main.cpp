@@ -71,7 +71,21 @@ void TestKyber768()
               << std::endl;
 }
 
-void TestNetworking()
+void TestNetworkingSimple()
+{
+    auto grid = HiveCom::NetworkGrid(
+        {
+            HiveCom::Connection("A", "B"), // Root node.
+            HiveCom::Connection("B", "A"),
+        },
+        HiveCom::NodeBuilder<HiveCom::RandomizedRouterNode>());
+
+    auto message = std::make_shared<HiveCom::Message>("A", "B", "Hello world");
+    grid.getNode("A")->sendMessage(message);
+    message->wait();
+}
+
+void TestNetworkingComplex()
 {
     auto grid = HiveCom::NetworkGrid(
         {
@@ -104,5 +118,6 @@ int main()
     TestAES();
     TestBase64();
     TestKyber768();
-    // TestNetworking(); // TODO: Add this with proper routing.
+    TestNetworkingSimple();
+    // TestNetworkingComplex(); // TODO: Add this with proper routing.
 }

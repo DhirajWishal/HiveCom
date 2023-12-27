@@ -58,7 +58,7 @@ namespace HiveCom
     KeyKyber768 Kyber768::generateKey()
     {
         static_assert(KeyKyber768::PublicKeySize == OQS_KEM_kyber_768_length_public_key, "Invalid public key size!");
-        static_assert(KeyKyber768::PrivateKeySize == OQS_KEM_kyber_768_length_secret_key, "Invalid public key size!");
+        static_assert(KeyKyber768::PrivateKeySize == OQS_KEM_kyber_768_length_secret_key, "Invalid private key size!");
 
         KeyKyber768::PublicKeyType publicKey;
         KeyKyber768::PrivateKeyType privateKey;
