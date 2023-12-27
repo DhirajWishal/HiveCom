@@ -72,6 +72,7 @@ namespace HiveCom
 
     bool Certificate::isPeriodValid(std::string_view timestamp) const
     {
+#if defined __cpp_lib_chrono && __cpp_lib_chrono >= 201907L
         std::istringstream stream{timestamp.data()};
 
         std::string line;
@@ -80,5 +81,10 @@ namespace HiveCom
         std::chrono::sys_seconds seconds;
         stream >> std::chrono::parse("%Y-%m-%dT%H:%M:%S%z", seconds);
         return (std::chrono::system_clock::now() - std::chrono::months(ValidityPeriod)) < seconds;
+
+#else
+        return true;
+
+#endif
     }
 } // namespace HiveCom

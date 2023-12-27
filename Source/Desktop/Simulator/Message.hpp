@@ -41,7 +41,7 @@ namespace HiveCom
         /// @param destination The destination of the message.
         /// @param message The message to be sent.
         /// @param flags The flag to set. Default is `MessageFlag::Message`.
-        explicit Message(std::string_view source, std::string_view destination, std::string_view message,
+        explicit Message(const std::string& source, const std::string& destination, const std::string& message,
                          MessageFlag flag = MessageFlag::Message);
 
         /// @brief Explicit constructor.
@@ -49,7 +49,7 @@ namespace HiveCom
         /// @param source The source of the message.
         /// @param destination The destination of the message.
         /// @param flags The flag to set. Default is `MessageFlag::Acknowledgement`.
-        explicit Message(std::string_view source, std::string_view destination,
+        explicit Message(const std::string& source, const std::string& destination,
                          MessageFlag flag = MessageFlag::Acknowledgement);
 
         /// @brief Create an acknowledgement packet with the current source and destination data.
@@ -72,6 +72,10 @@ namespace HiveCom
         {
             return m_destination;
         }
+
+        /// @brief Update the internally stored message.
+        /// @param message The message to update with.
+        void setMessage(std::string_view message);
 
         /// @brief Get the message content.
         /// @return The message contents.

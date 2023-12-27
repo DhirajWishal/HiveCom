@@ -43,6 +43,10 @@ namespace HiveCom
         /// @param padding The padding which will be removed once decrypted. Default is `\0`.
         [[nodiscard]] Bytes decrypt(Byte padding = Byte()) const;
 
+        /// @brief Update the internally stored ciphertext.
+        /// @param ciphertext The ciphertext to set.
+        void setCiphertext(ByteView ciphertext);
+
         /// @brief Get the generated ciphertext.
         /// @return The ciphertext view.
         [[nodiscard]] ByteView getCiphertext() const

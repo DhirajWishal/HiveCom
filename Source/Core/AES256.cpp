@@ -112,6 +112,11 @@ namespace HiveCom
         return plaintext;
     }
 
+    void AES256::setCiphertext(ByteView ciphertext)
+    {
+        m_cipherText = ciphertext.data();
+    }
+
     void AES256::validate(int value) const
     {
         // Skip if the value is 1.

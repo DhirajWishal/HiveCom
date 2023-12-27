@@ -68,7 +68,7 @@ namespace HiveCom
         const auto seconds = duration / 1'000'000.0f;
 
         // TODO: Notify the network grid that the message was received.
-        HC_LOG_INFO("Message received! Message: {}", message->getMessage());
+        HC_LOG_INFO("Message received! Message: {}", decryptMessage(message->getMessage(), message->getSource()));
         HC_LOG_INFO("Travel time: {}ns ({}ms)", duration, seconds);
 
         // Notify that the message was received.
@@ -132,13 +132,13 @@ namespace HiveCom
                 const auto encodedCiphertext = ToString(Base64(ToView(ciphertext)).encode());
                 const auto response = std::string(m_certificate.getCertificate()) + "\n" + encodedCiphertext;
 
-                // Send the authorization data.
-                handleRouting(
-                    std::make_shared<Message>(m_identifier, messageSource, response, MessageFlag::Authorization));
-
                 // Store the connection key.
                 m_connectionKeys[std::string(messageSource)] = AES256(
                     AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+
+                // Send the authorization data.
+                handleRouting(std::make_shared<Message>(
+                    m_identifier, messageSource, encryptMessage(response, messageSource), MessageFlag::Authorization));
             }
             else
             {
@@ -157,7 +157,7 @@ namespace HiveCom
         {
             // Extract the important information.
             const auto messageSource = message->getSource();
-            const auto content = message->getMessage();
+            const auto content = decryptMessage(message->getMessage(), message->getSource());
             const auto duration = message->getTravelTime();
             const auto seconds = duration / 1'000'000.0f;
 
@@ -225,5 +225,29 @@ namespace HiveCom
             splits.emplace_back(std::move(line));
 
         return splits;
+    }
+
+    std::string Node::encryptMessage(std::string_view message, std::string_view destination)
+    {
+        if (m_connectionKeys.contains(destination.data()))
+        {
+            auto &engine = m_connectionKeys[destination.data()];
+            engine.encrypt(ToBytes(message));
+            return ToString(Base64(engine.getCiphertext()).encode());
+        }
+
+        return message.data();
+    }
+
+    std::string Node::decryptMessage(std::string_view message, std::string_view destination)
+    {
+        if (m_connectionKeys.contains(destination.data()))
+        {
+            auto &engine = m_connectionKeys[destination.data()];
+            engine.setCiphertext(ToBytes(message));
+            return ToString(Base64(engine.decrypt()).encode());
+        }
+
+        return message.data();
     }
 } // namespace HiveCom

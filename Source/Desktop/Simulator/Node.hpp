@@ -4,8 +4,8 @@
 #include "Reactor.hpp"
 
 #include "Core/AES256.hpp"
-#include "Core/Kyber768.hpp"
 #include "Core/Certificate.hpp"
+#include "Core/Kyber768.hpp"
 
 #include <unordered_map>
 #include <vector>
@@ -98,6 +98,18 @@ namespace HiveCom
         /// @param content The content to split.
         /// @return The split string vector.
         [[nodiscard]] std::vector<std::string> splitContent(std::string_view content) const;
+
+        /// @brief Encrypt a message.
+        /// @param message The message to encrypt. 
+        /// @param destination Used to find the key.
+        /// @return The encrypted message.
+        [[nodiscard]] std::string encryptMessage(std::string_view message, std::string_view destination);
+
+        /// @brief Decrypt a message.
+        /// @param message The message to decrypt.
+        /// @param destination Used to find the key.
+        /// @return The decrypted message.
+        [[nodiscard]] std::string decryptMessage(std::string_view message, std::string_view destination);
 
       private:
         Reactor m_reactor;
