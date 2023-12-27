@@ -2,7 +2,6 @@
 
 #include "AES256Key.hpp"
 
-#include <type_traits>
 #include <vector>
 
 namespace HiveCom
@@ -57,20 +56,20 @@ namespace HiveCom
       private:
         /// @brief Validate a cryptographic operation.
         /// @param value The return value of the operation.
-        void validate(int value) const;
+        static void Validate(int value);
 
         /// @brief Split bytes to a vector of bytes.
         /// Add padding if necessary.
         /// @param bytes The bytes to split.
         /// @param padding The padding to add.
         /// @return The byte blocks.
-        [[nodiscard]] std::vector<ByteBlock> splitBytes(ByteView bytes, Byte padding) const;
+        [[nodiscard]] static std::vector<ByteBlock> SplitBytes(ByteView bytes, Byte padding);
 
         /// @brief Remove padding in bytes.
         /// This will remove paddings in the end of the bytes.
         /// @param bytes The bytes to remove the padding in.
         /// @param padding The padding byte.
-        void removePadding(Bytes &bytes, Byte padding) const;
+        static void RemovePadding(Bytes &bytes, Byte padding);
 
       private:
         AES256Key m_key;

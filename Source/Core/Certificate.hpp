@@ -20,13 +20,13 @@ namespace HiveCom
     /// Public key          + `\n`
     /// Issuer signature    + `\n`
     ///
-    /// Note that everything is in parsable string characters.
+    /// Note that everything is in UTF-8 string characters.
     class Certificate final
     {
       public:
         static constexpr auto ValidityPeriod = 6; // 6 months.
 
-        using PublicKeyType = typename Kyber768Key::PublicKeyType;
+        using PublicKeyType = Kyber768Key::PublicKeyType;
 
       public:
         /// @brief Default constructor.
@@ -103,12 +103,12 @@ namespace HiveCom
         /// @brief Split the certificate into multiple sub-strings by the `\n` character.
         /// @param certificate The certificate to split.
         /// @return The split string vector.
-        [[nodiscard]] std::vector<std::string> splitCertificate(std::string_view certificate) const;
+        [[nodiscard]] static std::vector<std::string> SplitCertificate(std::string_view certificate);
 
         /// @brief Check if the certificate's period is valid.
         /// @param timestamp The certificate generation timestamp.
         /// @return True if the time period is valid, else false.s
-        [[nodiscard]] bool isPeriodValid(std::string_view timestamp) const;
+        [[nodiscard]] static bool IsPeriodValid(std::string_view timestamp);
 
       private:
         PublicKeyType m_publicKey;

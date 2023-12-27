@@ -25,8 +25,8 @@ namespace HiveCom
         /// @param key The key to initialize with.
         /// @param iv The initialization vector to initialize with.
         /// @param auth The authentication bytes.
-        explicit AES256Key(const KeyType &key, const IVType &iv, const AuthType &auth)
-            : m_key(key), m_iv(iv), m_authentication(auth)
+        explicit AES256Key(const KeyType &key, const IVType &iv, AuthType auth)
+            : m_key(key), m_iv(iv), m_authentication(std::move(auth))
         {
         }
 

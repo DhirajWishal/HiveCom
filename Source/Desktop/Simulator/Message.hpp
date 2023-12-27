@@ -5,8 +5,26 @@
 #include <string>
 #include <string_view>
 
+#include <atomic>
+
 namespace HiveCom
 {
+    /// @brief Active message block structure.
+    /// This contains information about all the active messages pending to be received.
+    /// This internally uses a spinlock.
+    struct ActiveMessageBlock final
+    {
+        void increment();
+        void decrement();
+
+        void wait() const;
+
+        std::atomic_uintmax_t m_Count = 0;
+    };
+
+    /// @brief Active message block instance.
+    extern ActiveMessageBlock g_ActiveMessageBlock;
+
     /// @brief Message flags enum.
     /// This enum specifies the message flags used by each message.
     enum class MessageFlag : uint8_t
@@ -40,17 +58,16 @@ namespace HiveCom
         /// @param source The source of the message.
         /// @param destination The destination of the message.
         /// @param message The message to be sent.
-        /// @param flags The flag to set. Default is `MessageFlag::Message`.
-        explicit Message(const std::string& source, const std::string& destination, const std::string& message,
+        /// @param flag The flag to set. Default is `MessageFlag::Message`.
+        explicit Message(std::string source, std::string destination, std::string message,
                          MessageFlag flag = MessageFlag::Message);
 
         /// @brief Explicit constructor.
         /// This will be an acknowledgement packet (although can be overridden).
         /// @param source The source of the message.
         /// @param destination The destination of the message.
-        /// @param flags The flag to set. Default is `MessageFlag::Acknowledgement`.
-        explicit Message(const std::string& source, const std::string& destination,
-                         MessageFlag flag = MessageFlag::Acknowledgement);
+        /// @param flag The flag to set. Default is `MessageFlag::Acknowledgement`.
+        explicit Message(std::string source, std::string destination, MessageFlag flag = MessageFlag::Acknowledgement);
 
         /// @brief Create an acknowledgement packet with the current source and destination data.
         /// @return The acknowledgement message.
@@ -75,7 +92,7 @@ namespace HiveCom
 
         /// @brief Update the internally stored message.
         /// @param message The message to update with.
-        void setMessage(std::string_view message);
+        void setMessage(const std::string &message);
 
         /// @brief Get the message content.
         /// @return The message contents.

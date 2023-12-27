@@ -1,6 +1,5 @@
 #include "Dilithium3.hpp"
 #include "Logging.hpp"
-#include "oqs/common.h"
 
 #include <oqs/sig.h>
 
@@ -45,7 +44,7 @@ namespace HiveCom
 
     Dilithium3::Dilithium3() : m_pImplementation(new Implementation())
     {
-        static_assert(Dilithium3::SignatureSize == OQS_SIG_dilithium_3_length_signature, "Invalid shared secret size!");
+        static_assert(SignatureSize == OQS_SIG_dilithium_3_length_signature, "Invalid shared secret size!");
     }
 
     Dilithium3::~Dilithium3()
@@ -53,7 +52,7 @@ namespace HiveCom
         delete m_pImplementation;
     }
 
-    Dilithium3Key Dilithium3::generateKey()
+    Dilithium3Key Dilithium3::generateKey() const
     {
         static_assert(Dilithium3Key::PublicKeySize == OQS_SIG_dilithium_3_length_public_key,
                       "Invalid public key size!");
@@ -69,7 +68,7 @@ namespace HiveCom
         return Dilithium3Key(publicKey, privateKey);
     }
 
-    Dilithium3::SignatureType Dilithium3::sign(ByteView key, ByteView bytes)
+    Dilithium3::SignatureType Dilithium3::sign(const ByteView key, const ByteView bytes) const
     {
         SignatureType signature;
         std::size_t signatureLength = 0;
@@ -80,8 +79,8 @@ namespace HiveCom
         return signature;
     }
 
-    bool Dilithium3::verify(ByteView key, const Dilithium3::SignatureType &signature,
-                            ByteView bytes)
+    bool Dilithium3::verify(const ByteView key, const SignatureType &signature,
+                            const ByteView bytes) const
     {
         return OQS_SIG_verify(m_pImplementation->getSIG(), bytes.data(), bytes.size(), signature.data(),
                               signature.size(), key.data()) == OQS_SUCCESS;

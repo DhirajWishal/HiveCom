@@ -2,6 +2,7 @@
 #include "Logging.hpp"
 
 #include <oqs/kem.h>
+
 #include <utility>
 
 #define HC_OQS_ASSERT(exp, ...)                                                                                        \
@@ -46,7 +47,7 @@ namespace HiveCom
 
     Kyber768::Kyber768() : m_pImplementation(new Implementation())
     {
-        static_assert(Kyber768::SharedSecretSize == OQS_KEM_kyber_768_length_shared_secret,
+        static_assert(SharedSecretSize == OQS_KEM_kyber_768_length_shared_secret,
                       "Invalid shared secret size!");
     }
 
@@ -55,7 +56,7 @@ namespace HiveCom
         delete m_pImplementation;
     }
 
-    Kyber768Key Kyber768::generateKey()
+    Kyber768Key Kyber768::generateKey() const
     {
         static_assert(Kyber768Key::PublicKeySize == OQS_KEM_kyber_768_length_public_key, "Invalid public key size!");
         static_assert(Kyber768Key::PrivateKeySize == OQS_KEM_kyber_768_length_secret_key, "Invalid private key size!");
@@ -68,7 +69,7 @@ namespace HiveCom
         return Kyber768Key(publicKey, privateKey);
     }
 
-    Kyber768::EncapsulationType Kyber768::encapsulate(const ByteView &key)
+    Kyber768::EncapsulationType Kyber768::encapsulate(const ByteView &key) const
     {
         EncapsulationType data;
         HC_OQS_ASSERT(OQS_KEM_encaps(m_pImplementation->getKEM(), data.second.data(), data.first.data(), key.data()),
@@ -76,7 +77,7 @@ namespace HiveCom
         return data;
     }
 
-    Kyber768::SharedSecretType Kyber768::decapsulate(const ByteView &key, const Kyber768::CiphertextType &ciphertext)
+    Kyber768::SharedSecretType Kyber768::decapsulate(const ByteView &key, const CiphertextType &ciphertext) const
     {
         SharedSecretType sharedSecret;
         HC_OQS_ASSERT(OQS_KEM_decaps(m_pImplementation->getKEM(), sharedSecret.data(), ciphertext.data(), key.data()),

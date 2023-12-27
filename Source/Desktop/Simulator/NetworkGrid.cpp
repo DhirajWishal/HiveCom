@@ -5,7 +5,7 @@
 
 namespace HiveCom
 {
-    Connection::Connection(const std::string &source, std::string_view connections) : m_source(source)
+    Connection::Connection(std::string source, const std::string &connections) : m_source(std::move(source))
     {
         for (const auto character : connections)
         {
@@ -15,7 +15,7 @@ namespace HiveCom
         }
     }
 
-    void NetworkGrid::sendMessage(const MessagePtr &message, std::string_view hop)
+    void NetworkGrid::sendMessage(const MessagePtr &message, const std::string_view hop)
     {
         assert(!m_nodeMap.empty());
         m_nodeMap[hop.data()]->sendMessage(message);

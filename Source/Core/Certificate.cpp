@@ -31,7 +31,7 @@ namespace HiveCom
         : m_certificate(certificate.data())
     {
         // Split the certificate to splits.
-        const auto splits = splitCertificate(certificate);
+        const auto splits = SplitCertificate(certificate);
 
         // Validate the splits.
         if (splits.size() < 6)
@@ -53,11 +53,11 @@ namespace HiveCom
         for (std::size_t i = 0; i < 5; i++)
             rawCertificate += splits[i] + "\n";
 
-        // Verify the signature.
-        m_isValid = tool.verify(publicKey, signature, ToBytes(rawCertificate)) && isPeriodValid(m_timestamp);
+        // Verify the signature. TODO: Trusted keychain check.
+        m_isValid = tool.verify(publicKey, signature, ToBytes(rawCertificate)) && IsPeriodValid(m_timestamp);
     }
 
-    std::vector<std::string> Certificate::splitCertificate(std::string_view certificate) const
+    std::vector<std::string> Certificate::SplitCertificate(std::string_view certificate)
     {
         std::string line;
         std::vector<std::string> splits;
@@ -69,8 +69,9 @@ namespace HiveCom
         return splits;
     }
 
-    bool Certificate::isPeriodValid(std::string_view timestamp) const
+    bool Certificate::IsPeriodValid(const std::string_view timestamp)
     {
-        return std::stoi(timestamp.data()) > (std::chrono::system_clock::now() - std::chrono::months(ValidityPeriod)).time_since_epoch().count();
+        return std::stoi(timestamp.data()) >
+               (std::chrono::system_clock::now() - std::chrono::months(ValidityPeriod)).time_since_epoch().count();
     }
 } // namespace HiveCom

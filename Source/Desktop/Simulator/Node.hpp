@@ -10,9 +10,6 @@
 #include <unordered_map>
 #include <vector>
 
-/// @brief Macro to quickly convert serial number literals to IDs.
-#define GENERATE_ID(serial_number) #serial_number
-
 namespace HiveCom
 {
     /// @brief Forward declaration of the network grid.
@@ -28,7 +25,7 @@ namespace HiveCom
         /// @param identifier The node identifier.
         /// @param connections The connections of this node.
         /// @param pGrid The network grid pointer to which this node is attached to.
-        explicit Node(std::string_view identifier, const std::vector<std::string> &connections, NetworkGrid *pGrid);
+        explicit Node(std::string identifier, const std::vector<std::string> &connections, NetworkGrid *pGrid);
 
         /// @brief Virtual destructor.
         virtual ~Node() = default;
@@ -97,10 +94,10 @@ namespace HiveCom
         /// @brief Split the content into multiple sub-strings by the `\n` character.
         /// @param content The content to split.
         /// @return The split string vector.
-        [[nodiscard]] std::vector<std::string> splitContent(std::string_view content) const;
+        [[nodiscard]] static std::vector<std::string> SplitContent(std::string_view content);
 
         /// @brief Encrypt a message.
-        /// @param message The message to encrypt. 
+        /// @param message The message to encrypt.
         /// @param destination Used to find the key.
         /// @return The encrypted message.
         [[nodiscard]] std::string encryptMessage(std::string_view message, std::string_view destination);

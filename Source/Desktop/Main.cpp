@@ -100,7 +100,7 @@ void TestCertificate()
 
     const auto certificate =
         HiveCom::Certificate(1, "0001", "HiveCom", kemKey.getPublicKey(), authKey.getPrivateKey(), dilithium);
-    std::cout << "Certificate: " << certificate.getCertificate() << std::endl;
+    std::cout << "Certificate: " << std::endl << certificate.getCertificate() << std::endl;
 }
 
 void TestNetworkingSimple()
@@ -115,6 +115,8 @@ void TestNetworkingSimple()
     auto message = std::make_shared<HiveCom::Message>("A", "B", "Hello world");
     grid.getNode("A")->sendMessage(message);
     message->wait();
+
+    HiveCom::g_ActiveMessageBlock.wait();
 }
 
 void TestNetworkingComplex()

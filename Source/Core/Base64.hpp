@@ -28,7 +28,7 @@ namespace HiveCom
       private:
         /// @brief Validate a cryptographic operation.
         /// @param value The return value of the operation.
-        void validate(int value) const;
+        static void Validate(int value);
 
       private:
         ByteView m_bytes;

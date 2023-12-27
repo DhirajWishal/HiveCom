@@ -10,6 +10,7 @@ namespace HiveCom
     Reactor::~Reactor()
     {
         m_bShouldRun = false;
+        m_conditionVariable.notify_one();
         m_worker.join();
     }
 
@@ -26,9 +27,9 @@ namespace HiveCom
         m_startLatch.count_down();
 
         // Run all the tasks till we're about to exit.
-        while (m_bShouldRun)
+        while (m_bShouldRun || !m_tasks.empty())
         {
-            auto lock = std::unique_lock<std::mutex>(m_mutex);
+            auto lock = std::unique_lock(m_mutex);
             m_conditionVariable.wait(lock, [this] { return !m_tasks.empty() || m_bShouldRun == false; });
 
             // Run any remaining tasks if there are any.
@@ -46,10 +47,5 @@ namespace HiveCom
                 lock.lock();
             }
         }
-
-        // If we need to quit, quickly finish everything.
-        auto const locker = std::scoped_lock(m_mutex);
-        for (auto const &task : m_tasks)
-            task();
     }
 } // namespace HiveCom

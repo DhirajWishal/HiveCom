@@ -18,4 +18,4 @@ namespace HiveCom
 } // namespace HiveCom
 
 /// @brief Initializer declaration.
-extern HiveCom::OpenSSLInitializer _initializer;
+extern HiveCom::OpenSSLInitializer initializer;

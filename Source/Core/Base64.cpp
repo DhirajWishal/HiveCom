@@ -13,7 +13,7 @@ namespace HiveCom
             return {};
 
         Bytes bytes(4 * ((m_bytes.size() + 2) / 3), 0);
-        validate(bytes.size() == EVP_EncodeBlock(bytes.data(), m_bytes.data(), m_bytes.size()));
+        Validate(bytes.size() == EVP_EncodeBlock(bytes.data(), m_bytes.data(), m_bytes.size()));
 
         return bytes;
     }
@@ -25,12 +25,12 @@ namespace HiveCom
             return {};
 
         Bytes bytes(3 * m_bytes.size() / 4, 0);
-        validate(bytes.size() == EVP_DecodeBlock(bytes.data(), m_bytes.data(), m_bytes.size()));
+        Validate(bytes.size() == EVP_DecodeBlock(bytes.data(), m_bytes.data(), m_bytes.size()));
 
         return bytes;
     }
 
-    void Base64::validate(int value) const
+    void Base64::Validate(const int value)
     {
         // Skip if the value is 1.
         if (value == 1)

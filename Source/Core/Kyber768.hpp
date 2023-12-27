@@ -43,18 +43,18 @@ namespace HiveCom
 
         /// @brief Generate a new Kyber key.
         /// @return The generated key.
-        [[nodiscard]] Kyber768Key generateKey();
+        [[nodiscard]] Kyber768Key generateKey() const;
 
         /// @brief Encapsulate a generated key.
         /// @param key The public key to encapsulate.
         /// @return The pair of shared secret and ciphertext.
-        [[nodiscard]] EncapsulationType encapsulate(const ByteView &key);
+        [[nodiscard]] EncapsulationType encapsulate(const ByteView &key) const;
 
         /// @brief Decapsulate a generated key.
         /// @param key The private key to decapsulate with.
         /// @param ciphertext The cipher text.
         /// @return The shared secret.
-        [[nodiscard]] SharedSecretType decapsulate(const ByteView &key, const CiphertextType &ciphertext);
+        [[nodiscard]] SharedSecretType decapsulate(const ByteView &key, const CiphertextType &ciphertext) const;
 
       private:
         Implementation *m_pImplementation = nullptr;

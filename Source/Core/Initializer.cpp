@@ -18,4 +18,4 @@ namespace HiveCom
 } // namespace HiveCom
 
 /// @brief Initializer definition.
-HiveCom::OpenSSLInitializer _initializer = HiveCom::OpenSSLInitializer();
+HiveCom::OpenSSLInitializer initializer = HiveCom::OpenSSLInitializer();

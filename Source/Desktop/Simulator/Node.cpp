@@ -9,15 +9,16 @@
 
 namespace HiveCom
 {
-    Node::Node(std::string_view identifier, const std::vector<std::string> &connections, NetworkGrid *pGrid)
-        : m_identifier(identifier.data()), m_connections(connections), m_pNetworkGrid(pGrid)
+    Node::Node(std::string identifier, const std::vector<std::string> &connections, NetworkGrid *pGrid)
+        : m_identifier(std::move(identifier)), m_connections(connections), m_pNetworkGrid(pGrid)
     {
+        HC_LOG_INFO("Created node: {}", m_identifier);
         m_reactor.execute([this]() mutable { initialize(); });
     }
 
     void Node::sendMessage(const MessagePtr &message)
     {
-        m_reactor.execute([this, &message]() mutable { handleMessage(message); });
+        m_reactor.execute([this, message]() mutable { handleMessage(message); });
     }
 
     void Node::initialize()
@@ -26,11 +27,11 @@ namespace HiveCom
         m_kyberKey = m_kyber.generateKey();
         m_certificate = CertificateAuthority::Instance().createCertificate(m_kyberKey.getPublicKey());
 
-        // Setup the certificate.
+        // Set up the certificate.
         const auto message = m_certificate.getCertificate();
 
         // Share the keys with the connections.
-        for (const auto connection : m_connections)
+        for (const auto &connection : m_connections)
         {
             m_pNetworkGrid->sendMessage(
                 std::make_shared<Message>(m_identifier, connection, message.data(), MessageFlag::Discovery),
@@ -57,16 +58,13 @@ namespace HiveCom
         case MessageFlag::Message:
             onMessageReceived(message);
             break;
-
-        default:
-            break;
         }
     }
 
     void Node::handleMessageAccepted(const MessagePtr &message, bool shouldAck)
     {
         const auto duration = message->getTravelTime();
-        const auto seconds = duration / 1'000'000.0f;
+        const auto seconds = static_cast<double>(duration) / 1'000'000.0;
 
         // TODO: Notify the network grid that the message was received.
         HC_LOG_INFO("Message received! Message: {}", decryptMessage(message->getMessage(), message->getSource()));
@@ -77,13 +75,17 @@ namespace HiveCom
 
         // Reply if this isn't an acknowledgement.
         if (shouldAck)
-            handleRouting(message->createAcknowledgementPacket());
+        {
+            const auto ack = message->createAcknowledgementPacket();
+            handleRouting(ack);
+            ack->wait();
+        }
     }
 
     void Node::handleRouting(const MessagePtr &message)
     {
         // Check if the destination is in the connection list.
-        for (const auto connection : m_connections)
+        for (const auto &connection : m_connections)
         {
             if (message->getDestination() == connection)
             {
@@ -114,9 +116,8 @@ namespace HiveCom
             const auto messageSource = message->getSource();
             const auto certificate = message->getMessage();
             const auto duration = message->getTravelTime();
-            const auto seconds = duration / 1'000'000.0f;
+            const auto seconds = static_cast<double>(duration) / 1'000'000.0;
 
-            HC_LOG_INFO("Discovery received! Message: {}", certificate);
             HC_LOG_INFO("Travel time: {}ns ({}ms)", duration, seconds);
 
             // Notify that the message was received.
@@ -134,7 +135,7 @@ namespace HiveCom
                 const auto response = std::string(m_certificate.getCertificate()) + "\n" + encodedCiphertext;
 
                 // Store the connection key.
-                m_connectionKeys[std::string(messageSource)] = AES256(
+                m_connectionKeys[messageSource.data()] = AES256(
                     AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
 
                 // Send the authorization data.
@@ -161,9 +162,8 @@ namespace HiveCom
             const auto messageSource = message->getSource();
             const auto content = decryptMessage(message->getMessage(), message->getSource());
             const auto duration = message->getTravelTime();
-            const auto seconds = duration / 1'000'000.0f;
+            const auto seconds = static_cast<double>(duration) / 1'000'000.0;
 
-            HC_LOG_INFO("Authorization received! Message: {}", content);
             HC_LOG_INFO("Travel time: {}ns ({}ms)", duration, seconds);
 
             // Notify that the message was received.
@@ -173,15 +173,15 @@ namespace HiveCom
             handleRouting(message->createAcknowledgementPacket());
 
             // Split the content into certificate + ciphertext.
-            const auto splits = splitContent(content);
+            const auto splits = SplitContent(content);
             if (splits.size() < 2)
             {
                 HC_LOG_FATAL("Invalid authorization packet!");
                 return;
             }
 
-            const auto certificate = splits[0];
-            const auto ciphertext = splits[1];
+            const auto &certificate = splits[0];
+            const auto &ciphertext = splits[1];
 
             // Validate the certificate.
             const auto senderCertificate = CertificateAuthority::Instance().decodeCertificate(certificate);
@@ -217,7 +217,7 @@ namespace HiveCom
             handleRouting(message);
     }
 
-    std::vector<std::string> Node::splitContent(std::string_view content) const
+    std::vector<std::string> Node::SplitContent(std::string_view content)
     {
         std::string line;
         std::vector<std::string> splits;
@@ -229,7 +229,7 @@ namespace HiveCom
         return splits;
     }
 
-    std::string Node::encryptMessage(std::string_view message, std::string_view destination)
+    std::string Node::encryptMessage(const std::string_view message, const std::string_view destination)
     {
         // TODO: Extended encryption (two disconnected nodes).
         if (m_connectionKeys.contains(destination.data()))
@@ -242,7 +242,7 @@ namespace HiveCom
         return message.data();
     }
 
-    std::string Node::decryptMessage(std::string_view message, std::string_view destination)
+    std::string Node::decryptMessage(const std::string_view message, const std::string_view destination)
     {
         // TODO: Extended encryption (two disconnected nodes).
         if (m_connectionKeys.contains(destination.data()))

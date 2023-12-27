@@ -26,20 +26,20 @@ namespace HiveCom
 
         /// @brief Create a new Dilithium3 key.
         /// @return The key pair.
-        [[nodiscard]] Dilithium3Key generateKey();
+        [[nodiscard]] Dilithium3Key generateKey() const;
 
         /// @brief Sign the incoming bytes with a generated private key.
         /// @param key The private key to sign with.
         /// @param bytes The bytes to sign.
         /// @return The signature.
-        [[nodiscard]] SignatureType sign(ByteView key, ByteView bytes);
+        [[nodiscard]] SignatureType sign(ByteView key, ByteView bytes) const;
 
         /// @brief Verify a signature.
         /// @param key The public key to verify with.
         /// @param signature The signature to verify.
         /// @param bytes The bytes to verify.
         [[nodiscard]] bool verify(ByteView key, const SignatureType &signature,
-                                           ByteView bytes);
+                                           ByteView bytes) const;
 
       private:
         Implementation *m_pImplementation = nullptr;

@@ -14,8 +14,8 @@ namespace HiveCom
         /// @brief Explicit constructor.
         /// @param source The source node.
         /// @param connections The connections.
-        explicit Connection(const std::string &source, const std::vector<std::string> &connections)
-            : m_source(source), m_connections(connections)
+        explicit Connection(std::string source, const std::vector<std::string> &connections)
+            : m_source(std::move(source)), m_connections(connections)
         {
         }
 
@@ -23,7 +23,7 @@ namespace HiveCom
         /// @param source The source node.
         /// @param connections Connection string. This treats each character as the
         /// node ID.
-        explicit Connection(const std::string &source, std::string_view connections);
+        explicit Connection(std::string source, const std::string &connections);
 
         std::string m_source;
         std::vector<std::string> m_connections;
@@ -43,7 +43,7 @@ namespace HiveCom
         /// @param connections The node's connections.
         /// @param pGrid The grid pointer.
         /// @return The created unique node pointer.
-        std::unique_ptr<NodeType> operator()(std::string_view identifier, const std::vector<std::string> &connections,
+        std::unique_ptr<NodeType> operator()(const std::string &identifier, const std::vector<std::string> &connections,
                                              NetworkGrid *pGrid)
         {
             return std::make_unique<NodeType>(identifier, connections, pGrid);
@@ -60,10 +60,11 @@ namespace HiveCom
         /// The initial node will be considered as the root node.
         /// @param connections The connections in the grid. Make sure that each source
         /// in the connections are unique!
+        /// @param builder The builder to generate the nodes with.
         template <class NodeType>
         explicit NetworkGrid(const std::vector<Connection> &connections, NodeBuilder<NodeType> builder)
         {
-            // Setup the node grid.
+            // Set up the node grid.
             for (const auto &connection : connections)
                 m_nodeMap[connection.m_source] = builder(connection.m_source, connection.m_connections, this);
         }
@@ -71,9 +72,9 @@ namespace HiveCom
         /// @brief Get the node with the ID.
         /// @param node The node to access.
         /// @return The node pointer.
-        [[nodiscard]] Node *getNode(std::string_view node)
+        [[nodiscard]] Node *getNode(const std::string &node)
         {
-            return m_nodeMap[node.data()].get();
+            return m_nodeMap[node].get();
         }
 
         /// @brief Send a message through the network.
