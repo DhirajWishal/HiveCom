@@ -33,7 +33,8 @@ namespace HiveCom
         for (const auto connection : m_connections)
         {
             m_pNetworkGrid->sendMessage(
-                std::make_shared<Message>(m_identifier, connection, message, MessageFlag::Discovery), connection);
+                std::make_shared<Message>(m_identifier, connection, message.data(), MessageFlag::Discovery),
+                connection);
         }
     }
 
@@ -137,8 +138,9 @@ namespace HiveCom
                     AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
 
                 // Send the authorization data.
-                handleRouting(std::make_shared<Message>(
-                    m_identifier, messageSource, encryptMessage(response, messageSource), MessageFlag::Authorization));
+                handleRouting(std::make_shared<Message>(m_identifier, messageSource.data(),
+                                                        encryptMessage(response, messageSource),
+                                                        MessageFlag::Authorization));
             }
             else
             {
@@ -229,6 +231,7 @@ namespace HiveCom
 
     std::string Node::encryptMessage(std::string_view message, std::string_view destination)
     {
+        // TODO: Extended encryption (two disconnected nodes).
         if (m_connectionKeys.contains(destination.data()))
         {
             auto &engine = m_connectionKeys[destination.data()];
@@ -241,6 +244,7 @@ namespace HiveCom
 
     std::string Node::decryptMessage(std::string_view message, std::string_view destination)
     {
+        // TODO: Extended encryption (two disconnected nodes).
         if (m_connectionKeys.contains(destination.data()))
         {
             auto &engine = m_connectionKeys[destination.data()];
