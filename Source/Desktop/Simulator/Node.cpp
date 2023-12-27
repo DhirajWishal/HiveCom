@@ -23,9 +23,8 @@ namespace HiveCom
     void Node::initialize()
     {
         // Generate the certificate and keys.
-        auto [certificate, key] = CertificateAuthority::Instance().generateKeyPair();
-        m_certificate = certificate;
-        m_kyberKey = key;
+        m_kyberKey = m_kyber.generateKey();
+        m_certificate = CertificateAuthority::Instance().createCertificate(m_kyberKey.getPublicKey());
 
         // Setup the certificate.
         const auto message = m_certificate.getCertificate();
@@ -129,8 +128,7 @@ namespace HiveCom
             const auto senderCertificate = CertificateAuthority::Instance().decodeCertificate(certificate);
             if (senderCertificate.isValid())
             {
-                const auto [secret, ciphertext] = CertificateAuthority::Instance().getKyberEngine().encapsulate(
-                    ToView(senderCertificate.getPublicKey()));
+                const auto [secret, ciphertext] = m_kyber.encapsulate(ToView(senderCertificate.getPublicKey()));
                 const auto encodedCiphertext = ToString(Base64(ToView(ciphertext)).encode());
                 const auto response = std::string(m_certificate.getCertificate()) + "\n" + encodedCiphertext;
 
@@ -189,8 +187,8 @@ namespace HiveCom
             {
                 // Decode the incoming bytes and decapsulate.
                 const auto decodedBytes = Base64(ToBytes(ciphertext)).decode();
-                const auto secret = CertificateAuthority::Instance().getKyberEngine().decapsulate(
-                    m_kyberKey.getPrivateKey(), ToFixedBytes<Kyber768::CiphertextSize>(decodedBytes));
+                const auto secret = m_kyber.decapsulate(m_kyberKey.getPrivateKey(),
+                                                        ToFixedBytes<Kyber768::CiphertextSize>(decodedBytes));
 
                 // Store the connection key.
                 m_connectionKeys[std::string(messageSource)] = AES256(

@@ -4,6 +4,7 @@
 #include "Reactor.hpp"
 
 #include "Core/AES256.hpp"
+#include "Core/Kyber768.hpp"
 #include "Core/Certificate.hpp"
 
 #include <unordered_map>
@@ -101,6 +102,7 @@ namespace HiveCom
       private:
         Reactor m_reactor;
 
+        Kyber768 m_kyber;
         Kyber768Key m_kyberKey;
         Certificate m_certificate;
 

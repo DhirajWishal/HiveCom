@@ -152,6 +152,6 @@ int main()
     TestKyber768();
     TestDilithium3();
     TestCertificate();
-    // TestNetworkingSimple();
+    TestNetworkingSimple();
     // TestNetworkingComplex(); // TODO: Add this with proper routing.
 }

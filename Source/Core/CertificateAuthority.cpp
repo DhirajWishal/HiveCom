@@ -14,19 +14,16 @@ namespace HiveCom
         return instance;
     }
 
-    std::pair<Certificate, Kyber768Key> CertificateAuthority::generateKeyPair()
+    Certificate CertificateAuthority::createCertificate(ByteView publicKey)
     {
         const auto lock = std::scoped_lock(m_mutex);
-
-        auto keyPair = m_kyber.generateKey();
-        auto certificate = Certificate(1, "1", "HiveCom::CertificateAuthority", keyPair.getPublicKey(),
-                                       m_dilithiumKey.getPrivateKey(), m_dilithium);
-
-        return std::make_pair(certificate, keyPair);
+        return Certificate(1, "1", "HiveCom::CertificateAuthority", publicKey, m_dilithiumKey.getPrivateKey(),
+                           m_dilithium);
     }
 
     Certificate CertificateAuthority::decodeCertificate(std::string_view certificate)
     {
+        const auto lock = std::scoped_lock(m_mutex);
         return Certificate(certificate, m_dilithiumKey.getPublicKey(), m_dilithium);
     }
 } // namespace HiveCom
