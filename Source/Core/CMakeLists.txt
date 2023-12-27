@@ -16,6 +16,9 @@ set(
 	"Initializer.hpp"
     "Base64.cpp"
 	"Base64.hpp"
+    "Kyber768.cpp"
+	"Kyber768.hpp"
+	"KeyKyber768.hpp"
 )
 
 # Setup the library information.

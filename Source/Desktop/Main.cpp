@@ -5,6 +5,7 @@
 
 #include "../Core/AES256.hpp"
 #include "../Core/Base64.hpp"
+#include "../Core/Kyber768.hpp"
 
 void printBytes(HiveCom::ByteView view)
 {
@@ -47,6 +48,24 @@ void TestEncryption()
 
     const auto encoded = HiveCom::Base64(encodedData);
     std::cout << "Decoded bytes: " << HiveCom::ToString(encoded.decode()) << std::endl;
+
+    // Kyber test.
+    HiveCom::Kyber768 kyber;
+    const auto kyberKey = kyber.generateKey();
+    const auto [sharedSecret, ciphertext] = kyber.encapsulate(kyberKey.getPublicKey());
+    const auto ddata = kyber.decapsulate(kyberKey.getPrivateKey(), ciphertext);
+
+    std::cout << "Generated public key: " << HiveCom::ToString(HiveCom::Base64(kyberKey.getPublicKey()).encode())
+              << std::endl;
+    std::cout << "Generated private key: " << HiveCom::ToString(HiveCom::Base64(kyberKey.getPrivateKey()).encode())
+              << std::endl;
+
+    std::cout << "Ciphertext: " << HiveCom::ToString(HiveCom::Base64(HiveCom::ToView(ciphertext)).encode())
+              << std::endl;
+    std::cout << "Expected shared secret: " << HiveCom::ToString(HiveCom::Base64(HiveCom::ToView(sharedSecret)).encode())
+              << std::endl;
+    std::cout << "Actual shared secret:   " << HiveCom::ToString(HiveCom::Base64(HiveCom::ToView(ddata)).encode())
+              << std::endl;
 }
 
 void TestNetworking()
