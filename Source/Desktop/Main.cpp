@@ -6,8 +6,10 @@
 
 #include "Core/AES256.hpp"
 #include "Core/Base64.hpp"
+#include "Core/Certificate.hpp"
 #include "Core/Dilithium3.hpp"
 #include "Core/Kyber768.hpp"
+
 
 void PrintBytes(HiveCom::ByteView view)
 {
@@ -89,6 +91,19 @@ void TestDilithium3()
     std::cout << "Is valid: " << (isValid ? "True" : "False") << std::endl;
 }
 
+void TestCertificate()
+{
+    HiveCom::Dilithium3 dilithium;
+    const auto authKey = dilithium.generateKey();
+
+    HiveCom::Kyber768 kyber;
+    const auto kemKey = kyber.generateKey();
+
+    const auto certificate =
+        HiveCom::Certificate(1, "0001", kemKey.getPublicKey(), "HiveCom", authKey.getPrivateKey(), dilithium);
+    std::cout << "Certificate: " << certificate.getCertificate() << std::endl;
+}
+
 void TestNetworkingSimple()
 {
     auto grid = HiveCom::NetworkGrid(
@@ -137,6 +152,7 @@ int main()
     TestBase64();
     TestKyber768();
     TestDilithium3();
+    TestCertificate();
     TestNetworkingSimple();
     // TestNetworkingComplex(); // TODO: Add this with proper routing.
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/AES256Key.hpp"
 #include "Message.hpp"
 #include "Reactor.hpp"
 
