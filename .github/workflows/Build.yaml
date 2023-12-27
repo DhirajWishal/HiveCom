@@ -29,5 +29,12 @@ jobs:
       - name: Build
         run: cmake --build ${{github.workspace}}/Build --config ${{env.BUILD_TYPE}}
     
-      - name: Run
+      - if: ${{ matrix.os }} == windows-latest
+        name: Run
         run: ${{github.workspace}}/Build/Source/Desktop/${{env.BUILD_TYPE}}/Desktop
+      
+      - if: ${{ matrix.os }} != windows-latest
+        name: Run
+        run: |
+          chmod +x ${{github.workspace}}/Build/Source/Desktop/${{env.BUILD_TYPE}}/Desktop
+          ${{github.workspace}}/Build/Source/Desktop/${{env.BUILD_TYPE}}/Desktop
