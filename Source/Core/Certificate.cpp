@@ -7,8 +7,8 @@
 
 namespace HiveCom
 {
-    Certificate::Certificate(uint32_t version, const std::string &serial, const ByteView &publicKey,
-                             const std::string &issuerName, const ByteView &privateKey, Dilithium3 &tool)
+    Certificate::Certificate(uint32_t version, const std::string &serial, const std::string &issuerName,
+                             const ByteView &publicKey, const ByteView &privateKey, Dilithium3 &tool)
         : m_publicKey(ToFixedBytes<Kyber768Key::PublicKeySize>(publicKey)), m_serial(serial), m_issuerName(issuerName),
           m_version(version)
     {

@@ -2,6 +2,7 @@
 #include "NetworkGrid.hpp"
 
 #include "Core/Base64.hpp"
+#include "Core/CertificateAuthority.hpp"
 #include "Core/Logging.hpp"
 
 #include <memory>
@@ -21,18 +22,19 @@ namespace HiveCom
 
     void Node::initialize()
     {
-        // Generate the Kyber key.
-        m_kyberKey = m_kyber.generateKey();
+        // Generate the certificate and keys.
+        auto [certificate, key] = CertificateAuthority::Instance().generateKeyPair();
+        m_certificate = certificate;
+        m_kyberKey = key;
 
-        // Setup the encoded message to be sent to the peers.
-        const auto encodedMessage = ToString(Base64(m_kyberKey.getPublicKey()).encode());
+        // Setup the certificate.
+        const auto message = m_certificate.getCertificate();
 
         // Share the keys with the connections.
         for (const auto connection : m_connections)
         {
             m_pNetworkGrid->sendMessage(
-                std::make_shared<Message>(m_identifier, connection, encodedMessage, MessageFlag::Discovery),
-                connection);
+                std::make_shared<Message>(m_identifier, connection, message, MessageFlag::Discovery), connection);
         }
     }
 
@@ -110,31 +112,40 @@ namespace HiveCom
         {
             // Extract the important information.
             const auto messageSource = message->getSource();
-            const auto content = message->getMessage();
+            const auto certificate = message->getMessage();
             const auto duration = message->getTravelTime();
             const auto seconds = duration / 1'000'000.0f;
 
-            HC_LOG_INFO("Discovery received! Message: {}", content);
+            HC_LOG_INFO("Discovery received! Message: {}", certificate);
             HC_LOG_INFO("Travel time: {}ns ({}ms)", duration, seconds);
 
             // Notify that the message was received.
             message->received();
 
-            // Decode the incoming bytes and encapsulate the key.
-            const auto decodedBytes = Base64(ToBytes(content)).decode();
-            const auto [secret, ciphertext] = m_kyber.encapsulate(decodedBytes);
-            const auto encodedCiphertext = ToString(Base64(ToView(ciphertext)).encode());
-
             // Send the acknowledgement packet.
             handleRouting(message->createAcknowledgementPacket());
 
-            // Send the authorization data.
-            handleRouting(
-                std::make_shared<Message>(m_identifier, messageSource, encodedCiphertext, MessageFlag::Authorization));
+            // Decode the incoming bytes and encapsulate the key.
+            const auto senderCertificate = CertificateAuthority::Instance().decodeCertificate(certificate);
+            if (senderCertificate.isValid())
+            {
+                const auto [secret, ciphertext] = CertificateAuthority::Instance().getKyberEngine().encapsulate(
+                    ToView(senderCertificate.getPublicKey()));
+                const auto encodedCiphertext = ToString(Base64(ToView(ciphertext)).encode());
+                const auto response = std::string(m_certificate.getCertificate()) + "\n" + encodedCiphertext;
 
-            // Store the connection key.
-            m_connectionKeys[std::string(messageSource)] =
-                AES256(AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+                // Send the authorization data.
+                handleRouting(
+                    std::make_shared<Message>(m_identifier, messageSource, response, MessageFlag::Authorization));
+
+                // Store the connection key.
+                m_connectionKeys[std::string(messageSource)] = AES256(
+                    AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+            }
+            else
+            {
+                HC_LOG_FATAL("Invalid discovery packet!");
+            }
         }
         else
         {
@@ -161,14 +172,34 @@ namespace HiveCom
             // Send the acknowledgement packet.
             handleRouting(message->createAcknowledgementPacket());
 
-            // Decode the incoming bytes and decapsulate.
-            const auto decodedBytes = Base64(ToBytes(content)).decode();
-            const auto secret =
-                m_kyber.decapsulate(m_kyberKey.getPrivateKey(), ToFixedBytes<Kyber768::CiphertextSize>(decodedBytes));
+            // Split the content into certificate + ciphertext.
+            const auto splits = splitContent(content);
+            if (splits.size() < 2)
+            {
+                HC_LOG_FATAL("Invalid authorization packet!");
+                return;
+            }
 
-            // Store the connection key.
-            m_connectionKeys[std::string(messageSource)] =
-                AES256(AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+            const auto certificate = splits[0];
+            const auto ciphertext = splits[1];
+
+            // Validate the certificate.
+            const auto senderCertificate = CertificateAuthority::Instance().decodeCertificate(certificate);
+            if (senderCertificate.isValid())
+            {
+                // Decode the incoming bytes and decapsulate.
+                const auto decodedBytes = Base64(ToBytes(ciphertext)).decode();
+                const auto secret = CertificateAuthority::Instance().getKyberEngine().decapsulate(
+                    m_kyberKey.getPrivateKey(), ToFixedBytes<Kyber768::CiphertextSize>(decodedBytes));
+
+                // Store the connection key.
+                m_connectionKeys[std::string(messageSource)] = AES256(
+                    AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+            }
+            else
+            {
+                HC_LOG_FATAL("Invalid authorization packet!");
+            }
         }
         else
         {
@@ -184,5 +215,17 @@ namespace HiveCom
 
         else
             handleRouting(message);
+    }
+
+    std::vector<std::string> Node::splitContent(std::string_view content) const
+    {
+        std::string line;
+        std::vector<std::string> splits;
+        std::istringstream stream{content.data()};
+
+        while (std::getline(stream, line))
+            splits.emplace_back(std::move(line));
+
+        return splits;
     }
 } // namespace HiveCom

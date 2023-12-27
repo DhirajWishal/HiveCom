@@ -10,7 +10,6 @@
 #include "Core/Dilithium3.hpp"
 #include "Core/Kyber768.hpp"
 
-
 void PrintBytes(HiveCom::ByteView view)
 {
     for (const auto byte : view)
@@ -100,7 +99,7 @@ void TestCertificate()
     const auto kemKey = kyber.generateKey();
 
     const auto certificate =
-        HiveCom::Certificate(1, "0001", kemKey.getPublicKey(), "HiveCom", authKey.getPrivateKey(), dilithium);
+        HiveCom::Certificate(1, "0001", "HiveCom", kemKey.getPublicKey(), authKey.getPrivateKey(), dilithium);
     std::cout << "Certificate: " << certificate.getCertificate() << std::endl;
 }
 
@@ -153,6 +152,6 @@ int main()
     TestKyber768();
     TestDilithium3();
     TestCertificate();
-    TestNetworkingSimple();
+    // TestNetworkingSimple();
     // TestNetworkingComplex(); // TODO: Add this with proper routing.
 }

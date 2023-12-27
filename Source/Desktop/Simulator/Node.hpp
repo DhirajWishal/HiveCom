@@ -4,7 +4,7 @@
 #include "Reactor.hpp"
 
 #include "Core/AES256.hpp"
-#include "Core/Kyber768.hpp"
+#include "Core/Certificate.hpp"
 
 #include <unordered_map>
 #include <vector>
@@ -93,10 +93,16 @@ namespace HiveCom
         void onMessageReceived(const MessagePtr &message);
 
       private:
+        /// @brief Split the content into multiple sub-strings by the `\n` character.
+        /// @param content The content to split.
+        /// @return The split string vector.
+        [[nodiscard]] std::vector<std::string> splitContent(std::string_view content) const;
+
+      private:
         Reactor m_reactor;
 
-        Kyber768 m_kyber;
         Kyber768Key m_kyberKey;
+        Certificate m_certificate;
 
       protected:
         std::string m_identifier;

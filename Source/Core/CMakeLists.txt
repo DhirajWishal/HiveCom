@@ -26,6 +26,8 @@ set(
     "Dilithium3.cpp"
     "Dilithium3.hpp"
     "Dilithium3Key.hpp"
+    "CertificateAuthority.cpp"
+    "CertificateAuthority.hpp"
 )
 
 # Setup the library information.

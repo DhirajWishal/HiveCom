@@ -29,16 +29,19 @@ namespace HiveCom
         using PublicKeyType = typename Kyber768Key::PublicKeyType;
 
       public:
+        /// @brief Default constructor.
+        Certificate() = default;
+
         /// @brief Explicit constructor.
         /// This will automatically generate the issuer ID.
         /// @param version The version of the certificate.
         /// @param serial The serial number.
-        /// @param publicKey The public key to be stored.
         /// @param issuerName The issuer name.
+        /// @param publicKey The public key to be stored.
         /// @param privateKey The private key of the issuer.
         /// @param tool Signing tool.
-        explicit Certificate(uint32_t version, const std::string &serial, const ByteView &publicKey,
-                             const std::string &issuerName, const ByteView &privateKey, Dilithium3 &tool);
+        explicit Certificate(uint32_t version, const std::string &serial, const std::string &issuerName,
+                             const ByteView &publicKey, const ByteView &privateKey, Dilithium3 &tool);
 
         /// @brief Explicit constructor.
         /// This will extract all the necessary information from the certificate.
