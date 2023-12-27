@@ -17,6 +17,7 @@ namespace HiveCom
     {
         auto const locker = std::scoped_lock(m_mutex);
         m_tasks.emplace_back(std::move(task));
+        m_conditionVariable.notify_one();
     }
 
     void Reactor::workerMethod()
@@ -28,7 +29,7 @@ namespace HiveCom
         while (m_bShouldRun)
         {
             auto lock = std::unique_lock<std::mutex>(m_mutex);
-            m_conditionVariable.wait(lock, [this] { return m_tasks.empty() || m_bShouldRun == false; });
+            m_conditionVariable.wait(lock, [this] { return !m_tasks.empty() || m_bShouldRun == false; });
 
             // Run any remaining tasks if there are any.
             if (!m_tasks.empty())

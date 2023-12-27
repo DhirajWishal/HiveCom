@@ -55,17 +55,17 @@ namespace HiveCom
         delete m_pImplementation;
     }
 
-    KeyKyber768 Kyber768::generateKey()
+    Kyber768Key Kyber768::generateKey()
     {
-        static_assert(KeyKyber768::PublicKeySize == OQS_KEM_kyber_768_length_public_key, "Invalid public key size!");
-        static_assert(KeyKyber768::PrivateKeySize == OQS_KEM_kyber_768_length_secret_key, "Invalid private key size!");
+        static_assert(Kyber768Key::PublicKeySize == OQS_KEM_kyber_768_length_public_key, "Invalid public key size!");
+        static_assert(Kyber768Key::PrivateKeySize == OQS_KEM_kyber_768_length_secret_key, "Invalid private key size!");
 
-        KeyKyber768::PublicKeyType publicKey;
-        KeyKyber768::PrivateKeyType privateKey;
+        Kyber768Key::PublicKeyType publicKey;
+        Kyber768Key::PrivateKeyType privateKey;
         HC_OQS_ASSERT(OQS_KEM_keypair(m_pImplementation->getKEM(), publicKey.data(), privateKey.data()),
                       "Failed to generate key pair!");
 
-        return KeyKyber768(publicKey, privateKey);
+        return Kyber768Key(publicKey, privateKey);
     }
 
     Kyber768::EncapsulationType Kyber768::encapsulate(const ByteView &key)

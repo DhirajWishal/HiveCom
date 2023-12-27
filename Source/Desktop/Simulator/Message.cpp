@@ -7,9 +7,10 @@
 
 namespace HiveCom
 {
-    Message::Message(std::string_view source, std::string_view destination, std::string_view message)
+    Message::Message(std::string_view source, std::string_view destination, std::string_view message,
+                     MessageFlag flag /*= MessageFlag::Message*/)
         : m_latch(0), m_source(source.data()), m_destination(destination.data()), m_message(message.data()),
-          m_timestamp(CURRENT_TIME)
+          m_timestamp(CURRENT_TIME), m_flag(flag)
     {
     }
 

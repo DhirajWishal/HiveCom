@@ -30,3 +30,10 @@ add_executable(
 
 # Setup the link libraries.
 target_link_libraries(Desktop Core)
+
+# Setup the include directories.
+target_include_directories(
+    Desktop
+
+    PRIVATE "${MAIN_INCLUDE_DIR}"
+)

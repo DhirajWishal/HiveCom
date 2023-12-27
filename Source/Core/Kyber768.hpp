@@ -14,7 +14,7 @@
 /// 6. A and B uses 's' to encrypt communications.
 ///
 
-#include "KeyKyber768.hpp"
+#include "Kyber768Key.hpp"
 
 namespace HiveCom
 {
@@ -43,7 +43,7 @@ namespace HiveCom
 
         /// @brief Generate a new Kyber key.
         /// @return The generated key.
-        [[nodiscard]] KeyKyber768 generateKey();
+        [[nodiscard]] Kyber768Key generateKey();
 
         /// @brief Encapsulate a generated key.
         /// @param key The public key to encapsulate.

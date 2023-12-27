@@ -88,5 +88,8 @@
         "random": "cpp",
         "*.rh": "cpp",
         "barrier": "cpp"
-    }
+    },
+    "cSpell.words": [
+        "Dilithium"
+    ]
 }

@@ -7,7 +7,7 @@ namespace HiveCom
 {
     /// @brief Key class for the AES256 encryption.
     /// This class contains the key, IV and authentication (salt) for AES256 block encryption.
-    class KeyAES256 final : public Key
+    class AES256Key final : public Key
     {
       public:
         static constexpr auto KeySize = 256 / 8;
@@ -19,13 +19,13 @@ namespace HiveCom
 
       public:
         /// @brief Default constructor.
-        KeyAES256() = default;
+        AES256Key() = default;
 
         /// @brief Explicit constructor.
         /// @param key The key to initialize with.
         /// @param iv The initialization vector to initialize with.
         /// @param auth The authentication bytes.
-        explicit KeyAES256(const KeyType &key, const IVType &iv, const AuthType &auth)
+        explicit AES256Key(const KeyType &key, const IVType &iv, const AuthType &auth)
             : m_key(key), m_iv(iv), m_authentication(auth)
         {
         }

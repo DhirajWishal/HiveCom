@@ -21,7 +21,7 @@ namespace HiveCom
         validate(EVP_EncryptInit_ex(pContext, EVP_aes_256_gcm(), nullptr, nullptr, nullptr));
 
         // Set the IV size.
-        validate(EVP_CIPHER_CTX_ctrl(pContext, EVP_CTRL_GCM_SET_IVLEN, KeyAES256::IVSize, nullptr));
+        validate(EVP_CIPHER_CTX_ctrl(pContext, EVP_CTRL_GCM_SET_IVLEN, AES256Key::IVSize, nullptr));
 
         // Initialize the key and initialization vector.
         validate(EVP_EncryptInit_ex(pContext, nullptr, nullptr, m_key.getKey().data(), m_key.getIV().data()));
@@ -70,7 +70,7 @@ namespace HiveCom
         validate(EVP_DecryptInit_ex(pContext, EVP_aes_256_gcm(), nullptr, nullptr, nullptr));
 
         // Initialize the initializing vector.
-        validate(EVP_CIPHER_CTX_ctrl(pContext, EVP_CTRL_GCM_SET_IVLEN, KeyAES256::IVSize, nullptr));
+        validate(EVP_CIPHER_CTX_ctrl(pContext, EVP_CTRL_GCM_SET_IVLEN, AES256Key::IVSize, nullptr));
 
         // Set the key and initialization vector.
         validate(EVP_DecryptInit_ex(pContext, nullptr, nullptr, m_key.getKey().data(), m_key.getIV().data()));

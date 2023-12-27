@@ -42,6 +42,19 @@ namespace HiveCom
         return bytes;
     }
 
+    /// @brief Convert a string of bytes to fixed bytes.
+    /// @tparam Size The byte size constant.
+    /// @param input The incoming string of bytes.
+    /// @return The converted fixed bytes.
+    template <std::size_t Size> FixedBytes<Size> ToFixedBytes(const ByteView &input)
+    {
+        FixedBytes<Size> bytes;
+        for (std::size_t i = 0; i < Size - 1; i++)
+            bytes[i] = input[i];
+
+        return bytes;
+    }
+
     /// @brief Convert a bytes to a string.
     /// @param bytes The bytes to convert.
     /// @return The converted string.

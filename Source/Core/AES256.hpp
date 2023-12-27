@@ -1,6 +1,6 @@
 #pragma once
 
-#include "KeyAES256.hpp"
+#include "AES256Key.hpp"
 
 #include <type_traits>
 #include <vector>
@@ -17,10 +17,20 @@ namespace HiveCom
         using ByteBlock = FixedBytes<BlockSize>;
 
       public:
+        /// @brief Default constructor.
+        AES256() = default;
+
         /// @brief Explicit constructor.
         /// @param key The key to encrypt/ decrypt the data with.
-        explicit AES256(const KeyAES256 &key) : m_key(key)
+        explicit AES256(const AES256Key &key) : m_key(key)
         {
+        }
+
+        /// @brief Set the key.
+        /// @param key The key to set.
+        void setKey(const AES256Key &key)
+        {
+            m_key = key;
         }
 
         /// @brief Encrypt a block of bytes.
@@ -59,7 +69,7 @@ namespace HiveCom
         void removePadding(Bytes &bytes, Byte padding) const;
 
       private:
-        KeyAES256 m_key;
+        AES256Key m_key;
         Bytes m_cipherText;
     };
 } // namespace HiveCom

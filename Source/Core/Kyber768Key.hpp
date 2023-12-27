@@ -6,7 +6,7 @@
 namespace HiveCom
 {
     /// @brief Kyber 768 encryption key storage.
-    class KeyKyber768 final : public Key
+    class Kyber768Key final : public Key
     {
       public:
         static constexpr auto PublicKeySize = 1184;  // Size taken from `OQS_KEM_kyber_768_length_public_key`.
@@ -16,10 +16,13 @@ namespace HiveCom
         using PrivateKeyType = FixedBytes<PrivateKeySize>;
 
       public:
+        /// @brief Default constructor.
+        Kyber768Key() = default;
+
         /// @brief Explicit constructor.
         /// @param publicKey The public key.
         /// @param privateKey The private key.
-        explicit KeyKyber768(const PublicKeyType &publicKey, const PrivateKeyType &privateKey)
+        explicit Kyber768Key(const PublicKeyType &publicKey, const PrivateKeyType &privateKey)
             : m_publicKey(publicKey), m_privateKey(privateKey)
         {
         }

@@ -10,7 +10,7 @@ set(
 	"AES256.cpp"
 	"AES256.hpp"
     "Key.hpp"
-    "KeyAES256.hpp"
+    "AES256Key.hpp"
     "Types.hpp"
     "Initializer.cpp"
 	"Initializer.hpp"
@@ -18,8 +18,14 @@ set(
 	"Base64.hpp"
     "Kyber768.cpp"
 	"Kyber768.hpp"
-	"KeyKyber768.hpp"
+	"Kyber768Key.hpp"
 	"Logging.hpp"
+    "Certificate.cpp"
+	"Certificate.hpp"
+	"SHA256.hpp"
+    "Dilithium3.cpp"
+    "Dilithium3.hpp"
+    "Dilithium3Key.hpp"
 )
 
 # Setup the library information.

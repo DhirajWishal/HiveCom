@@ -1,13 +1,39 @@
 #include "Node.hpp"
 #include "NetworkGrid.hpp"
 
-#include "../../Core/Logging.hpp"
+#include "Core/Base64.hpp"
+#include "Core/Logging.hpp"
+
+#include <memory>
 
 namespace HiveCom
 {
+    Node::Node(std::string_view identifier, const std::vector<std::string> &connections, NetworkGrid *pGrid)
+        : m_identifier(identifier.data()), m_connections(connections), m_pNetworkGrid(pGrid)
+    {
+        m_reactor.execute([this]() mutable { initialize(); });
+    }
+
     void Node::sendMessage(const MessagePtr &message)
     {
         m_reactor.execute([this, &message]() mutable { handleMessage(message); });
+    }
+
+    void Node::initialize()
+    {
+        // Generate the Kyber key.
+        m_kyberKey = m_kyber.generateKey();
+
+        // Setup the encoded message to be sent to the peers.
+        const auto encodedMessage = ToString(Base64(m_kyberKey.getPublicKey()).encode());
+
+        // Share the keys with the connections.
+        for (const auto connection : m_connections)
+        {
+            m_pNetworkGrid->sendMessage(
+                std::make_shared<Message>(m_identifier, connection, encodedMessage, MessageFlag::Discovery),
+                connection);
+        }
     }
 
     void Node::handleMessage(const MessagePtr &message)
@@ -49,9 +75,7 @@ namespace HiveCom
 
         // Reply if this isn't an acknowledgement.
         if (shouldAck)
-        {
-            auto response = Message(m_identifier, message->getDestination());
-        }
+            handleRouting(message->createAcknowledgementPacket());
     }
 
     void Node::handleRouting(const MessagePtr &message)
@@ -82,14 +106,74 @@ namespace HiveCom
 
     void Node::onDiscoveryReceived(const MessagePtr &message)
     {
-        // TODO: Handle proper discovery.
-        handleMessageAccepted(message, true);
+        if (message->getDestination() == m_identifier)
+        {
+            // Extract the important information.
+            const auto messageSource = message->getSource();
+            const auto content = message->getMessage();
+            const auto duration = message->getTravelTime();
+            const auto seconds = duration / 1'000'000.0f;
+
+            HC_LOG_INFO("Discovery received! Message: {}", content);
+            HC_LOG_INFO("Travel time: {}ns ({}ms)", duration, seconds);
+
+            // Notify that the message was received.
+            message->received();
+
+            // Decode the incoming bytes and encapsulate the key.
+            const auto decodedBytes = Base64(ToBytes(content)).decode();
+            const auto [secret, ciphertext] = m_kyber.encapsulate(decodedBytes);
+            const auto encodedCiphertext = ToString(Base64(ToView(ciphertext)).encode());
+
+            // Send the acknowledgement packet.
+            handleRouting(message->createAcknowledgementPacket());
+
+            // Send the authorization data.
+            handleRouting(
+                std::make_shared<Message>(m_identifier, messageSource, encodedCiphertext, MessageFlag::Authorization));
+
+            // Store the connection key.
+            m_connectionKeys[std::string(messageSource)] =
+                AES256(AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+        }
+        else
+        {
+            handleRouting(message);
+        }
     }
 
     void Node::onAuthorizationReceived(const MessagePtr &message)
     {
-        // TODO: Handle proper authorization.
-        handleMessageAccepted(message, false);
+        if (message->getDestination() == m_identifier)
+        {
+            // Extract the important information.
+            const auto messageSource = message->getSource();
+            const auto content = message->getMessage();
+            const auto duration = message->getTravelTime();
+            const auto seconds = duration / 1'000'000.0f;
+
+            HC_LOG_INFO("Authorization received! Message: {}", content);
+            HC_LOG_INFO("Travel time: {}ns ({}ms)", duration, seconds);
+
+            // Notify that the message was received.
+            message->received();
+
+            // Send the acknowledgement packet.
+            handleRouting(message->createAcknowledgementPacket());
+
+            // Decode the incoming bytes and decapsulate.
+            const auto decodedBytes = Base64(ToBytes(content)).decode();
+            const auto secret =
+                m_kyber.decapsulate(m_kyberKey.getPrivateKey(), ToFixedBytes<Kyber768::CiphertextSize>(decodedBytes));
+
+            // Store the connection key.
+            m_connectionKeys[std::string(messageSource)] =
+                AES256(AES256Key(secret, HiveCom::ToFixedBytes("0123456789012345"), HiveCom::ToBytes("Hello World")));
+        }
+        else
+        {
+            handleRouting(message);
+        }
     }
 
     void Node::onMessageReceived(const MessagePtr &message)

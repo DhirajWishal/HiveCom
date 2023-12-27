@@ -1,8 +1,13 @@
 #pragma once
 
+#include "Core/AES256Key.hpp"
 #include "Message.hpp"
 #include "Reactor.hpp"
 
+#include "Core/AES256.hpp"
+#include "Core/Kyber768.hpp"
+
+#include <unordered_map>
 #include <vector>
 
 /// @brief Macro to quickly convert serial number literals to IDs.
@@ -23,10 +28,7 @@ namespace HiveCom
         /// @param identifier The node identifier.
         /// @param connections The connections of this node.
         /// @param pGrid The network grid pointer to which this node is attached to.
-        explicit Node(std::string_view identifier, const std::vector<std::string> &connections, NetworkGrid *pGrid)
-            : m_identifier(identifier.data()), m_connections(connections), m_pNetworkGrid(pGrid)
-        {
-        }
+        explicit Node(std::string_view identifier, const std::vector<std::string> &connections, NetworkGrid *pGrid);
 
         /// @brief Virtual destructor.
         virtual ~Node() = default;
@@ -58,6 +60,10 @@ namespace HiveCom
         virtual void route(const MessagePtr &message) = 0;
 
       private:
+        /// @brief Initialize the connections in another thread.
+        /// This is to simulate how an actual node would setup connections.
+        void initialize();
+
         /// @brief Handle the incoming message in another thread.
         /// @param message The message to handle.
         void handleMessage(const MessagePtr &message);
@@ -90,9 +96,13 @@ namespace HiveCom
       private:
         Reactor m_reactor;
 
+        Kyber768 m_kyber;
+        Kyber768Key m_kyberKey;
+
       protected:
         std::string m_identifier;
         std::vector<std::string> m_connections;
+        std::unordered_map<std::string, AES256> m_connectionKeys;
 
         NetworkGrid *m_pNetworkGrid = nullptr;
     };

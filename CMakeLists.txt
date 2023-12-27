@@ -25,6 +25,7 @@ set(OQS_BUILD_ONLY_LIB ON) # build only the liboqs library and not anything else
 # set(OQS_EMBEDDED_BUILD  ON)
 
 set(SPDLOG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spdlog/include)
+set(MAIN_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
 # Add the third party subdirectories.
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/liboqs)
@@ -41,4 +42,5 @@ file(
     "-I${LIBOQS_INCLUDE_DIR}\n"
     "-I${OPENSSL_INCLUDE_DIR}\n"
     "-I${SPDLOG_INCLUDE_DIR}\n"
+    "-I${MAIN_INCLUDE_DIR}\n"
 )
