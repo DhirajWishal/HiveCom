@@ -17,8 +17,7 @@ namespace HiveCom
         rawCertificate << version << "\n";
         rawCertificate << serial << "\n";
         rawCertificate << issuerName << "\n";
-        rawCertificate << std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now())
-                       << "\n";
+        rawCertificate << std::chrono::system_clock::now().time_since_epoch().count() << "\n";
         rawCertificate << ToString(Base64(publicKey).encode()) << "\n";
 
         const auto signature = tool.sign(privateKey, ToBytes(rawCertificate.str()));
@@ -72,20 +71,6 @@ namespace HiveCom
 
     bool Certificate::isPeriodValid(std::string_view timestamp) const
     {
-// TODO: Enable this with proper C++20 support.
-#if false
-        std::istringstream stream{timestamp.data()};
-
-        std::string line;
-        std::getline(stream, line);
-
-        std::chrono::sys_seconds seconds;
-        stream >> std::chrono::parse("%Y-%m-%dT%H:%M:%S%z", seconds);
-        return (std::chrono::system_clock::now() - std::chrono::months(ValidityPeriod)) < seconds;
-
-#else
-        return true;
-
-#endif
+        return std::stoi(timestamp.data()) > (std::chrono::system_clock::now() - std::chrono::months(ValidityPeriod)).time_since_epoch().count();
     }
 } // namespace HiveCom
