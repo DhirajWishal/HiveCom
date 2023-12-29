@@ -28,7 +28,7 @@ std::vector<HiveCom::Connection> RandomGraphGenerator(std::size_t nodeCount, std
     for (std::size_t i = 0; i < nodeCount; i++)
     {
         auto &currentPeers = peers.emplace_back();
-        const auto currentPeerCount = std::max(1ull, engine() % peerCount);
+        const auto currentPeerCount = std::max<std::size_t>(1, engine() % peerCount);
         for (std::size_t j = 0; j < currentPeerCount; j++)
             currentPeers.insert(engine() % (nodeCount / 2));
     }
