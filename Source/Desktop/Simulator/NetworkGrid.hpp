@@ -69,6 +69,9 @@ namespace HiveCom
                 m_nodeMap[connection.m_source] = builder(connection.m_source, connection.m_connections, this);
         }
 
+        /// @brief Destructor.
+        ~NetworkGrid();
+
         /// @brief Get the node with the ID.
         /// @param node The node to access.
         /// @return The node pointer.

@@ -5,26 +5,8 @@
 #include <string>
 #include <string_view>
 
-#include <atomic>
-
 namespace HiveCom
 {
-    /// @brief Active message block structure.
-    /// This contains information about all the active messages pending to be received.
-    /// This internally uses a spinlock.
-    struct ActiveMessageBlock final
-    {
-        void increment();
-        void decrement();
-
-        void wait() const;
-
-        std::atomic_uintmax_t m_Count = 0;
-    };
-
-    /// @brief Active message block instance.
-    extern ActiveMessageBlock g_ActiveMessageBlock;
-
     /// @brief Message flags enum.
     /// This enum specifies the message flags used by each message.
     enum class MessageFlag : uint8_t

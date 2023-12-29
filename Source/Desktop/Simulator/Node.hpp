@@ -119,8 +119,9 @@ namespace HiveCom
       protected:
         std::string m_identifier;
         std::vector<std::string> m_connections;
+
         std::unordered_map<std::string, AES256> m_connectionKeys;
-        std::unordered_map<uint64_t, std::function<void()>> m_onAcknowledgementMap;
+        std::unordered_map<std::string, std::vector<MessagePtr>> m_pendingMessages;
 
         NetworkGrid *m_pNetworkGrid = nullptr;
     };

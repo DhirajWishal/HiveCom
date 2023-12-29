@@ -117,11 +117,9 @@ void TestNetworkingSimple()
         },
         HiveCom::NodeBuilder<HiveCom::RandomizedRouterNode>());
 
-    auto message = std::make_shared<HiveCom::Message>("A", "B", "Hello world");
+    const auto message = std::make_shared<HiveCom::Message>("A", "B", "Hello world");
     grid.getNode("A")->sendMessage(message);
     message->wait();
-
-    HiveCom::g_ActiveMessageBlock.wait();
 }
 
 void TestNetworkingComplex()
@@ -147,11 +145,9 @@ void TestNetworkingComplex()
         },
         HiveCom::NodeBuilder<HiveCom::RandomizedRouterNode>());
 
-    auto message = std::make_shared<HiveCom::Message>("N", "M", "Hello world");
+    const auto message = std::make_shared<HiveCom::Message>("N", "M", "Hello world");
     grid.getNode("N")->sendMessage(message);
     message->wait();
-
-    HiveCom::g_ActiveMessageBlock.wait();
 }
 
 int main()

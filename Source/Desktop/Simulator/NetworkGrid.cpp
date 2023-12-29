@@ -1,6 +1,5 @@
 #include "NetworkGrid.hpp"
 
-#include <cassert>
 #include <string_view>
 
 namespace HiveCom
@@ -15,9 +14,14 @@ namespace HiveCom
         }
     }
 
+    NetworkGrid::~NetworkGrid()
+    {
+        m_nodeMap.clear();
+    }
+
     void NetworkGrid::sendMessage(const MessagePtr &message, const std::string_view hop)
     {
-        assert(!m_nodeMap.empty());
-        m_nodeMap[hop.data()]->sendMessage(message);
+        if (m_nodeMap.contains(hop.data()))
+            m_nodeMap[hop.data()]->sendMessage(message);
     }
 } // namespace HiveCom
