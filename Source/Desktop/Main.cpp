@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Core/Types.hpp"
 #include "Simulator/NetworkGrid.hpp"
 #include "Simulator/RandomizedRouterNode.hpp"
@@ -10,10 +8,48 @@
 #include "Core/Dilithium3.hpp"
 #include "Core/Kyber768.hpp"
 
+#include <iostream>
+#include <random>
+#include <set>
+
 void PrintBytes(HiveCom::ByteView view)
 {
     for (const auto byte : view)
         std::cout << static_cast<int>(byte);
+}
+
+std::vector<HiveCom::Connection> RandomGraphGenerator(std::size_t nodeCount, std::size_t peerCount)
+{
+    // Setup node connections.
+    std::vector<std::set<std::size_t>> peers;
+    peers.reserve(nodeCount);
+
+    std::default_random_engine engine;
+    for (std::size_t i = 0; i < nodeCount; i++)
+    {
+        auto &currentPeers = peers.emplace_back();
+        const auto currentPeerCount = std::max(1ull, engine() % peerCount);
+        for (std::size_t j = 0; j < currentPeerCount; j++)
+            currentPeers.insert(engine() % (nodeCount / 2));
+    }
+
+    // Set up the connections.
+    std::vector<HiveCom::Connection> connections;
+    connections.reserve(nodeCount);
+
+    for (std::size_t i = 0; i < nodeCount; i++)
+    {
+        const auto name = std::to_string(i);
+        std::vector<std::string> nodePeers;
+        nodePeers.reserve(peers[i].size());
+
+        for (const auto index : peers[i])
+            nodePeers.emplace_back(std::to_string(index));
+
+        connections.emplace_back(std::move(name), std::move(nodePeers));
+    }
+
+    return connections;
 }
 
 void TestAES()
@@ -150,6 +186,16 @@ void TestNetworkingComplex()
     message->wait();
 }
 
+void TestNetworkingRandom(std::size_t nodes, std::size_t peers)
+{
+    auto grid =
+        HiveCom::NetworkGrid(RandomGraphGenerator(nodes, peers), HiveCom::NodeBuilder<HiveCom::RandomizedRouterNode>());
+
+    const auto message = std::make_shared<HiveCom::Message>("0", std::to_string(nodes - 1), "Hello world");
+    grid.getNode("0")->sendMessage(message);
+    message->wait();
+}
+
 int main()
 {
     TestAES();
@@ -158,5 +204,8 @@ int main()
     TestDilithium3();
     TestCertificate();
     TestNetworkingSimple();
-    TestNetworkingComplex(); // TODO: Add this with proper routing.
+
+    // TODO: Implement a better routing protocol.
+    // TestNetworkingComplex();
+    // TestNetworkingRandom(100, 10);
 }

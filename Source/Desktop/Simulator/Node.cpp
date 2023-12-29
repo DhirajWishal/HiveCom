@@ -50,7 +50,7 @@ namespace HiveCom
         }
     }
 
-    void Node::handleMessageAccepted(const MessagePtr &message, bool shouldAck)
+    void Node::handleMessageAccepted(const MessagePtr &message)
     {
         const auto duration = message->getTravelTime();
         const auto seconds = static_cast<double>(duration) / 1'000'000.0;
@@ -61,9 +61,8 @@ namespace HiveCom
         // Notify that the message was received.
         message->received();
 
-        // Reply if this isn't an acknowledgement.
-        if (shouldAck)
-            handleRouting(message->createAcknowledgementPacket());
+        // Send the acknowledgement packet.
+        handleRouting(message->createAcknowledgementPacket());
     }
 
     Message *Node::handleRouting(const MessagePtr &message)
@@ -224,7 +223,7 @@ namespace HiveCom
         // Check if this is the required destination.
         else if (message->getDestination() == m_identifier)
         {
-            handleMessageAccepted(message, true);
+            handleMessageAccepted(message);
         }
         else
         {
